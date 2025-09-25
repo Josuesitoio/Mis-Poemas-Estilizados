@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poesía en el Viento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <script>
+      // Configuración de Tailwind para extender colores y fuentes
+      tailwind.config = {
+        darkMode: 'class', // Habilitar modo oscuro basado en una clase en <html>
+        theme: {
+          extend: {
+            colors: {
+              'cream': '#FDF6E3',
+              'dark-blue': '#0A192F',
+              'burgundy': '#800020',
+              'soft-gold': '#D4AF37',
+            },
+            fontFamily: {
+              'serif': ['Merriweather', 'serif'],
+              'sans': ['Lato', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+</head>
+<body class="bg-cream font-sans text-dark-blue dark:bg-dark-blue dark:text-cream transition-colors duration-500">
+
+    <nav class="fixed top-0 left-0 w-full bg-cream/80 dark:bg-dark-blue/80 backdrop-blur-sm shadow-md z-50 transition-colors duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="font-bold text-xl text-burgundy dark:text-soft-gold">Poesía en el Viento</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-soft-gold/20 dark:hover:bg-cream/20">Inicio</a>
+                    <a href="poemas.html" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-soft-gold/20 dark:hover:bg-cream/20">Poemas</a>
+                    <button id="darkModeToggle" class="p-2 rounded-full hover:bg-soft-gold/20 dark:hover:bg-cream/20">
+                        <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="fixed top-0 left-0 w-full h-full -z-10 bg-cream dark:bg-dark-blue">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-soft-gold/10 via-transparent to-transparent dark:from-cream/5"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-burgundy/10 via-transparent to-transparent dark:from-soft-gold/5"></div>
+</div>
+
+<main class="pt-24 pb-16 min-h-screen">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 fade-in-up">
+        
+        <div class="mb-8">
+            <a href="poemas.html" class="text-soft-gold dark:text-cream hover:underline">
+                &larr; Volver a Poemas
+            </a>
+        </div>
+
+        <article class="font-serif text-lg md:text-xl leading-relaxed text-dark-blue/90 dark:text-cream/90">
+            <h1 class="text-4xl md:text-5xl font-bold text-center text-burgundy dark:text-soft-gold mb-12">
+                El Eco del Silencio
+            </h1>
+
+            <p class="mb-6">
+                En el vasto lienzo de la noche sin estrellas,<br>
+                donde el tiempo se detiene y respira,<br>
+                busqué tu voz en el murmullo de las huellas<br>
+                que dejó tu ausencia en mi lira.
+            </p>
+
+            <p class="mb-6">
+                El eco del silencio es más profundo<br>
+                que cualquier grito ahogado en la tormenta,<br>
+                un abismo sereno, vagabundo,<br>
+                que el alma con su propia nada alimenta.
+            </p>
+
+            <p class="mb-6">
+                Las paredes susurran conversaciones,<br>
+                fragmentos de risas, promesas de un ayer,<br>
+                y yo, coleccionista de ilusiones,<br>
+                intento reconstruirte en mi anochecer.
+            </p>
+
+            <p class="mb-6">
+                Quizás no te has ido, solo te has disuelto<br>
+                en el aire que respiro, en la luz tenue,<br>
+                un poema invisible, nunca resuelto,<br>
+                un amor que en la memoria se mantiene.
+            </p>
+        </article>
+    </div>
+</main>
+        </main>
+
+    <footer class="relative bg-gray-200 dark:bg-gray-900 py-8 overflow-hidden">
+        <div id="footer-particles" class="absolute top-0 left-0 w-full h-full z-0">
+            <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+            <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+            <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+            <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        </div>
+        <div class="text-center text-gray-600 dark:text-gray-400 relative z-10">
+            <p>&copy; 2025 Poesía en el Viento. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

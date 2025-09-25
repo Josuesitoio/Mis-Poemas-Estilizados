@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudor y púas</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Kalam:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --paper-bg: #f3efe9;
+            --ink-color: #2b2825;
+            --highlight-ink-color: #000;
+            --blood-color: #ab2a2a;
+            --annotation-color: #4a5568;
+            --notebook-line-color: rgba(180, 200, 230, 0.5);
+            --paper-texture: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23d4cfc8" fill-opacity="0.1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+
+            --font-main: 'Kalam', cursive;
+            --font-highlight: 'Caveat', cursive;
+        }
+
+        body {
+            background-color: var(--paper-bg);
+            background-image: 
+                repeating-linear-gradient(var(--paper-bg), var(--paper-bg) 3.1rem, var(--notebook-line-color) 3.1rem, var(--notebook-line-color) 3.15rem),
+                var(--paper-texture);
+            color: var(--ink-color);
+            font-family: var(--font-main);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        main {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .notebook-page {
+            max-width: 700px;
+            padding: 5rem 2rem 5rem 4rem;
+            position: relative;
+            border-left: 2px solid rgba(255, 150, 150, 0.4);
+        }
+
+        header {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 1px dashed rgba(0,0,0,0.1);
+            margin-bottom: 5rem;
+        }
+
+        header h1 {
+            font-family: var(--font-highlight);
+            font-size: 3rem;
+            color: var(--highlight-ink-color);
+        }
+
+        .estrofa {
+            margin-bottom: 15rem;
+            position: relative;
+        }
+
+        .estrofa p {
+            font-size: 1.8rem;
+            line-height: 1.7;
+            margin: 1.4rem 0;
+            clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+            transition: clip-path 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+        .estrofa.visible p {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .highlight {
+            font-family: var(--font-highlight);
+            font-size: 2.2rem;
+            color: var(--highlight-ink-color);
+            position: relative;
+            transition: all 0.2s;
+        }
+        .highlight:hover {
+            transform: translateY(-2px);
+        }
+
+        .underline::after {
+            content: ''; position: absolute; left: 0; bottom: -5px; width: 100%; height: 2px;
+            background-color: var(--annotation-color); transform: scaleX(0); transform-origin: left;
+            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .estrofa.visible .underline::after { transform: scaleX(1); }
+
+        .circle { position: relative; }
+        .circle .circle-svg {
+            position: absolute; top: 50%; left: 50%; width: 130%; height: 160%;
+            transform: translate(-50%, -50%); z-index: -1;
+            stroke: var(--annotation-color); stroke-width: 2; fill: none;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+            transition: stroke-dashoffset 1.2s ease-in-out;
+        }
+        .estrofa.visible .circle .circle-svg { stroke-dashoffset: 0; }
+
+        /* --- NUEVO EFECTO DE MANCHÓN DE TINTA ROJA --- */
+        .ink-blot {
+            color: var(--blood-color);
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+        .ink-blot::after {
+            content: '';
+            position: absolute;
+            z-index: -1;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 150%;
+            background-color: var(--blood-color);
+            border-radius: 45% 55% 60% 40% / 50% 45% 55% 50%; /* Forma de mancha irregular */
+            filter: blur(12px);
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5);
+            transition: opacity 1s, transform 1s;
+        }
+        .estrofa.visible .ink-blot::after {
+            opacity: 0.5;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .doodle {
+            position: absolute; width: 60px; height: 60px; opacity: 0;
+            transition: opacity 1.5s; stroke: var(--annotation-color); stroke-width: 2; fill: none;
+        }
+        .estrofa.visible .doodle {
+            opacity: 0.5;
+        }
+        #doodle1 { top: 50%; right: -90px; transform: rotate(15deg); }
+        #doodle2 { bottom: -20%; left: -90px; transform: rotate(-10deg) scaleX(-1); }
+
+        @media (max-width: 768px) {
+            .notebook-page { padding: 5rem 1rem; border-left: none; }
+            header h1 { font-size: 2.5rem; }
+            .estrofa p { font-size: 1.4rem; line-height: 2; margin: 1rem 0; }
+            body { background-size: auto 4rem, auto; }
+            .doodle { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="notebook-page">
+            <header>
+                <h1>Sudor y púas</h1>
+            </header>
+
+            <section class="estrofa">
+                <p>Cuando te conocí,</p>
+                <p>me hablaste de <span class="highlight underline">amores rotos,</span></p>
+                <p>de dar mucho y recibir nada.</p>
+                <p>En tus palabras vi mi <span class="highlight">propio reflejo,</span></p>
+                <p>y juré enseñarte el amor verdadero.</p>
+            </section>
+            
+            <section class="estrofa">
+                 <svg class="doodle" id="doodle1" viewBox="0 0 100 100">
+                    <path d="M50,10 C 70,0 90,20 90,40 S 70,80 50,90 S 30,80 10,40 S 30,0 50,10" stroke-linecap="round"/>
+                    <path d="M50,30 L 50,70 M35,50 L 65,50 M35,30 L 65,70 M65,30 L 35,70" stroke-width="1.5" />
+                 </svg>
+                <p>Qué ingenuo fui,</p>
+                <p>abracé al <span class="highlight circle">puercoespín, <svg class="circle-svg"><ellipse cx="50" cy="50" rx="45" ry="30"/></svg></span></p>
+                <p>suave al tacto, seductor,</p>
+                <p>pero <span class="highlight">punzante, hiriente,</span></p>
+                <p>me hacía sudar sin descanso.</p>
+            </section>
+
+            <section class="estrofa">
+                <p>Cada abrazo borraba mis sombras,</p>
+                <p>pero el sudor caía, extraño,</p>
+                <p>susurré en silencio: “¿por qué arde así el alma?”</p>
+            </section>
+            
+            <section class="estrofa">
+                <p>Hasta que un día, él habló,</p>
+                <p>y dijo: “hoy encontré quien no <span class="highlight ink-blot">sangra,</span></p>
+                <p>quien se ofrece sin heridas.”</p>
+                <p>¿Sangra? pregunté sin entender,</p>
+                <p>sin ver que mis <span class="highlight underline">espinas crecían</span></p>
+                <p>y que yo era quien <span class="highlight ink-blot">sangraba.</span></p>
+            </section>
+
+            <section class="estrofa">
+                 <svg class="doodle" id="doodle2" viewBox="0 0 100 100">
+                    <path d="M20,20 Q50,10 80,30 T 70,80 Q50,95 20,70 T20,20" stroke-linecap="round" />
+                    <path d="M50,50 L50,80 Q55,85 60,80 T70,80" />
+                 </svg>
+                <p>El puercoespín calló,</p>
+                <p>y se refugió en otros brazos,</p>
+                <p>libre de espinas,</p>
+                <p>mientras yo llevaba el peso de todas.</p>
+            </section>
+            
+            <section class="estrofa">
+                <p>Entonces comprendí que el sudor nunca fue tal,</p>
+                <p>sino el <span class="highlight ink-blot">derrame profundo</span></p>
+                <p>de un <span class="highlight ink-blot">amor en rojo,</span></p>
+                <p>un sacrificio silencioso</p>
+                <p>que <span class="highlight ink-blot">desangró</span> mi corazón.</p>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const estrofas = document.querySelectorAll('.estrofa');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const estrofa = entry.target;
+                        estrofa.classList.add('visible');
+                        
+                        const lines = estrofa.querySelectorAll('p');
+                        lines.forEach((line, index) => {
+                            line.style.transitionDelay = `${index * 150}ms`;
+                        });
+                        
+                        const highlights = estrofa.querySelectorAll('.underline, .circle, .ink-blot');
+                        highlights.forEach(highlight => {
+                             highlight.style.transitionDelay = `${lines.length * 150 + 200}ms`;
+                        });
+
+                        observer.unobserve(estrofa);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            estrofas.forEach(estrofa => observer.observe(estrofa));
+        });
+    </script>
+</body>
+</html>

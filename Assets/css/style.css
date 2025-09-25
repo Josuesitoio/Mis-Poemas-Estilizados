@@ -1,0 +1,192 @@
+/* assets/css/style.css */
+
+/* Animación para el fondo del Hero Section en la página de inicio */
+.animated-gradient {
+    background: linear-gradient(-45deg, #0A192F, #800020, #FDF6E3, #D4AF37);
+    background-size: 400% 400%;
+    animation: gradient-flow 15s ease infinite;
+}
+.dark .animated-gradient {
+    background: linear-gradient(-45deg, #0A192F, #3a000c, #1f2937, #D4AF37);
+    background-size: 400% 400%;
+    animation: gradient-flow 15s ease infinite;
+}
+
+@keyframes gradient-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Animación de entrada para el texto del Hero */
+.fade-in-up {
+    animation: fadeInUp 1s ease-out forwards;
+    opacity: 0;
+}
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+.delay-3 { animation-delay: 0.6s; }
+
+
+/* Partículas animadas para el footer */
+#footer-particles .particle {
+    position: absolute;
+    bottom: -20px; /* Inician fuera de la vista */
+    background-color: rgba(156, 163, 175, 0.2); /* gris claro semi-transparente */
+    border-radius: 50%;
+    animation: rise 10s infinite linear;
+    opacity: 0;
+}
+
+.dark #footer-particles .particle {
+    background-color: rgba(200, 175, 55, 0.1); /* dorado suave semi-transparente */
+}
+
+/* Asignar diferentes tamaños, posiciones y retrasos a cada partícula */
+#footer-particles .particle:nth-child(1) { width: 5px; height: 5px; left: 10%; animation-duration: 15s; animation-delay: 0s; }
+#footer-particles .particle:nth-child(2) { width: 8px; height: 8px; left: 20%; animation-duration: 10s; animation-delay: 1s; }
+#footer-particles .particle:nth-child(3) { width: 3px; height: 3px; left: 30%; animation-duration: 18s; animation-delay: 2s; }
+#footer-particles .particle:nth-child(4) { width: 6px; height: 6px; left: 40%; animation-duration: 12s; animation-delay: 0.5s; }
+#footer-particles .particle:nth-child(5) { width: 4px; height: 4px; left: 50%; animation-duration: 20s; animation-delay: 3s; }
+#footer-particles .particle:nth-child(6) { width: 7px; height: 7px; left: 60%; animation-duration: 9s; animation-delay: 1.5s; }
+#footer-particles .particle:nth-child(7) { width: 5px; height: 5px; left: 70%; animation-duration: 16s; animation-delay: 4s; }
+#footer-particles .particle:nth-child(8) { width: 3px; height: 3px; left: 80%; animation-duration: 22s; animation-delay: 2.5s; }
+#footer-particles .particle:nth-child(9) { width: 8px; height: 8px; left: 90%; animation-duration: 8s; animation-delay: 0.8s; }
+#footer-particles .particle:nth-child(10) { width: 4px; height: 4px; left: 95%; animation-duration: 14s; animation-delay: 3.5s; }
+/* ... puedes agregar más ... */
+
+@keyframes rise {
+    0% {
+        transform: translateY(0) scale(0.5);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-120px) scale(1.2); /* Mover hacia arriba */
+        opacity: 0;
+    }
+}
+
+/*
+ * ============================================
+ * --- 1. EFECTO LEVANTADO PARA LA TARJETA ---
+ * ============================================
+ *
+ * Para usarlo, añade la clase "poem-card" a tu tarjeta. Ejemplo:
+ * <div class="relative group ... stanza poem-card">
+ *
+*/
+.poem-card {
+    /* Sombra sutil para el efecto "levantado" */
+    box-shadow: 0px 10px 25px -5px rgba(0, 0, 0, 0.07), 
+                0px 8px 10px -6px rgba(0, 0, 0, 0.07);
+    
+    /* Hacemos la transición de la sombra más suave */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .poem-card {
+    /* Una sombra ligeramente diferente para el modo oscuro, usando un blanco muy sutil */
+    box-shadow: 0px 10px 25px -5px rgba(0, 0, 0, 0.2), 
+                0px 8px 10px -6px rgba(0, 0, 0, 0.2);
+}
+
+.poem-card:hover {
+    /* Al pasar el mouse, la sombra se hace un poco más pronunciada para realzar el efecto */
+    box-shadow: 0px 20px 30px -8px rgba(0, 0, 0, 0.15), 
+                0px 12px 15px -10px rgba(0, 0, 0, 0.15);
+}
+
+.dark .poem-card:hover {
+    box-shadow: 0px 20px 30px -8px rgba(0, 0, 0, 0.3), 
+                0px 12px 15px -10px rgba(0, 0, 0, 0.3);
+}
+
+
+/*
+ * ============================================
+ * --- 2. FONDO DE LUCIÉRNAGAS (EL MISMO DEL POEMA) ---
+ * ============================================
+ *
+ * NOTA: Este CSS asume que el HTML del contenedor de partículas 
+ * (#particle-container) ya existe en tu página.
+*/
+
+/* --- Contenedor de partículas --- */
+#particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1; /* Se asegura de que esté detrás de todo */
+}
+
+/* --- Estilo base de cada luciérnaga --- */
+.firefly {
+    position: absolute;
+    border-radius: 50%;
+    background: var(--firefly-color);
+    /* Dos animaciones: una para el movimiento y otra para el parpadeo */
+    animation: drift 20s infinite ease-in-out, pulse 4s infinite ease-in-out;
+}
+
+/* --- Animación para el movimiento --- */
+@keyframes drift {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(calc(var(--i) * 3vw), calc(var(--i) * -4vh)); }
+    40% { transform: translate(calc(var(--i) * -2vw), calc(var(--i) * -8vh)); }
+    60% { transform: translate(calc(var(--i) * 4vw), calc(var(--i) * -12vh)); }
+    80% { transform: translate(calc(var(--i) * -1vw), calc(var(--i) * -16vh)); }
+    100% { transform: translate(calc(var(--i) * 2vw), -110vh); }
+}
+
+/* --- Animación para el parpadeo --- */
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 0; 
+        box-shadow: none; 
+    }
+    50% { 
+        opacity: 1; 
+        box-shadow: 0 0 8px var(--firefly-color), 0 0 16px var(--firefly-color); 
+    }
+    55% { 
+        opacity: 0.2; 
+        box-shadow: 0 0 4px var(--firefly-color); 
+    }
+    65% { 
+        opacity: 0.8; 
+        box-shadow: 0 0 7px var(--firefly-color), 0 0 14px var(--firefly-color); 
+    }
+}
+
+/* --- Variaciones individuales para que no se muevan todas igual --- */
+.firefly:nth-child(1)  { --i: 1; width: 4px; height: 4px; top: 85vh; left: 10vw; animation-delay: 0s; animation-duration: 25s, 3.5s; }
+.firefly:nth-child(2)  { --i: -1; width: 6px; height: 6px; top: 90vh; left: 25vw; animation-delay: 2s; animation-duration: 20s, 5s; }
+.firefly:nth-child(3)  { --i: 1; width: 3px; height: 3px; top: 80vh; left: 40vw; animation-delay: 4s; animation-duration: 30s, 4s; }
+.firefly:nth-child(4)  { --i: -1; width: 5px; height: 5px; top: 95vh; left: 55vw; animation-delay: 7s; animation-duration: 22s, 3s; }
+.firefly:nth-child(5)  { --i: 1; width: 6px; height: 6px; top: 88vh; left: 70vw; animation-delay: 9s; animation-duration: 28s, 4.5s; }
+.firefly:nth-child(6)  { --i: -1; width: 4px; height: 4px; top: 92vh; left: 85vw; animation-delay: 12s; animation-duration: 19s, 5.2s; }
+.firefly:nth-child(7)  { --i: 1; width: 3px; height: 3px; top: 82vh; left: 5vw; animation-delay: 15s; animation-duration: 24s, 3.8s; }
+.firefly:nth-child(8)  { --i: -1; width: 5px; height: 5px; top: 98vh; left: 90vw; animation-delay: 1s; animation-duration: 26s, 4.2s; }
+.firefly:nth-child(9)  { --i: 1; width: 4px; height: 4px; top: 86vh; left: 15vw; animation-delay: 6s; animation-duration: 23s, 3.3s; }
+.firefly:nth-child(10) { --i: -1; width: 7px; height: 7px; top: 84vh; left: 30vw; animation-delay: 10s; animation-duration: 32s, 5.5s; }
+.firefly:nth-child(11) { --i: 1; width: 3px; height: 3px; top: 93vh; left: 50vw; animation-delay: 3s; animation-duration: 27s, 4.8s; }
+.firefly:nth-child(12) { --i: -1; width: 5px; height: 5px; top: 81vh; left: 75vw; animation-delay: 8s; animation-duration: 21s, 3.6s; }

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Cuaderno del Desamor</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Kalam:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Tema Claro (por defecto) */
+            --paper-bg: #f3efe9;
+            --ink-color: #2b2825;
+            --highlight-ink-color: #000;
+            --blood-color: #c53030;
+            --annotation-color: #4a5568;
+            --notebook-line-color: rgba(180, 200, 230, 0.5);
+            --paper-texture: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23d4cfc8" fill-opacity="0.1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+
+            --font-main: 'Kalam', cursive;
+            --font-highlight: 'Caveat', cursive;
+            --transition-speed: 0.4s;
+        }
+
+        body.dark-mode {
+            /* Tema Oscuro */
+            --paper-bg: #2d2d2d;
+            --ink-color: #c7c7c7;
+            --highlight-ink-color: #ffffff;
+            --blood-color: #e53e3e;
+            --annotation-color: #718096;
+            --notebook-line-color: rgba(90, 110, 140, 0.3);
+            --paper-texture: url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23454545" fill-opacity="0.1"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
+        }
+
+        body {
+            background-color: var(--paper-bg);
+            /* Capas de fondo: líneas de cuaderno sobre la textura */
+            background-image: 
+                repeating-linear-gradient(var(--paper-bg), var(--paper-bg) 3.1rem, var(--notebook-line-color) 3.1rem, var(--notebook-line-color) 3.15rem),
+                var(--paper-texture);
+            color: var(--ink-color);
+            font-family: var(--font-main);
+            margin: 0;
+            overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        main {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .notebook-page {
+            max-width: 700px;
+            padding: 5rem 2rem 5rem 4rem; /* Más espacio a la izquierda para el margen */
+            position: relative;
+            /* Línea de margen roja del cuaderno */
+            border-left: 2px solid rgba(255, 150, 150, 0.4);
+        }
+
+        header {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border-bottom: 1px dashed rgba(0,0,0,0.1); /* Línea punteada como de pre-corte */
+            margin-bottom: 5rem;
+        }
+        body.dark-mode header { border-bottom-color: rgba(255,255,255,0.1); }
+
+        header h1 {
+            font-family: var(--font-highlight);
+            font-size: 3rem;
+            color: var(--highlight-ink-color);
+            transition: color var(--transition-speed);
+        }
+
+        .estrofa {
+            margin-bottom: 15rem;
+            position: relative;
+        }
+
+        .estrofa p {
+            font-size: 1.8rem;
+            line-height: 1.7; /* Alineado con el rayado del cuaderno */
+            margin: 1.4rem 0; /* Doble espacio para que coincida con el rayado */
+            clip-path: polygon(0 0, 0 0, 0 100%, 0% 100%);
+            transition: clip-path 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+        .estrofa.visible p {
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+
+        .highlight {
+            font-family: var(--font-highlight);
+            font-size: 2.2rem;
+            color: var(--highlight-ink-color);
+            position: relative;
+            transition: all 0.2s;
+        }
+        .highlight:hover {
+            transform: translateY(-2px);
+        }
+
+        .underline::after {
+            content: ''; position: absolute; left: 0; bottom: -5px; width: 100%; height: 2px;
+            background-color: var(--annotation-color); transform: scaleX(0); transform-origin: left;
+            transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .estrofa.visible .underline::after { transform: scaleX(1); }
+        
+        .circle { position: relative; }
+        .circle .circle-svg {
+            position: absolute; top: 50%; left: 50%; width: 130%; height: 160%;
+            transform: translate(-50%, -50%); z-index: -1;
+            stroke: var(--annotation-color); stroke-width: 2; fill: none;
+            stroke-dasharray: 1000; stroke-dashoffset: 1000;
+            transition: stroke-dashoffset 1.2s ease-in-out;
+        }
+        .estrofa.visible .circle .circle-svg { stroke-dashoffset: 0; }
+        
+
+        .strikethrough { position: relative; }
+        .strikethrough::after {
+            content: ''; position: absolute; left: 0; top: 55%; width: 100%; height: 2px;
+            background-image: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M0,50 Q25,25 50,50 T100,50" fill="none" stroke-width="3" stroke="black" /></svg>');
+            background-size: 100% 100%; transform: scaleX(0); transform-origin: left;
+            transition: transform 0.6s ease-out;
+        }
+        body.dark-mode .strikethrough::after { background-image: url('data:image/svg+xml;utf8,<svg preserveAspectRatio="none" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M0,50 Q25,25 50,50 T100,50" fill="none" stroke-width="3" stroke="white" /></svg>'); }
+        
+        .estrofa.visible .strikethrough::after { transform: scaleX(1); }
+
+        .bleeding { position: relative; z-index: 1; }
+        .bleeding::before {
+            content: ''; position: absolute; left: -5px; top: 0; right: -5px; bottom: 0;
+            background-color: var(--blood-color); filter: blur(8px); border-radius: 3px;
+            z-index: -1; opacity: 0.6; transform: scaleY(0);
+            transition: transform 0.8s ease;
+        }
+        .estrofa.visible .bleeding::before { transform: scaleY(1.3); }
+
+        .blurry { filter: blur(2px); transition: filter 0.5s; }
+
+        .doodle {
+            position: absolute; width: 50px; height: 50px; opacity: 0;
+            transition: opacity 1.5s; stroke: var(--annotation-color); stroke-width: 2; fill: none;
+        }
+        .estrofa.visible .doodle { opacity: 0.5; }
+        #doodle1 { top: 20%; right: -80px; transform: rotate(15deg); }
+        #doodle2 { top: 50%; left: -90px; transform: rotate(-20deg); }
+        #doodle3 { bottom: 0%; right: -70px; width: 40px; }
+
+        #theme-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 1000; font-size: 1.5rem;
+            background: transparent; border: none; cursor: pointer; transition: transform 0.3s;
+        }
+        #theme-toggle:hover { transform: scale(1.2) rotate(10deg); }
+        #sun-icon { display: none; }
+        body.dark-mode #sun-icon { display: block; }
+        body.dark-mode #moon-icon { display: none; }
+
+        @media (max-width: 768px) {
+            .notebook-page { padding: 5rem 1rem; border-left: none; }
+            header h1 { font-size: 2.2rem; }
+            .estrofa p { font-size: 1.4rem; line-height: 2; margin: 1rem 0; background-size: auto 4rem; }
+            body { background-size: auto 4rem, auto; }
+            .doodle { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <button id="theme-toggle" title="Cambiar tema">
+        <span id="moon-icon">🌙</span>
+        <span id="sun-icon">☀️</span>
+    </button>
+
+    <main>
+        <div class="notebook-page">
+            <header>
+                <h1>Nadie va a pensar en ti mejor que yo</h1>
+            </header>
+
+            <section class="estrofa">
+                <p>Nadie va a pensar en ti mejor que yo</p>
+                <p>pensé al verla , sin saber que</p>
+                <p>ella no entendía, pues aunque</p>
+                <p>constaté, yo repetía,</p>
+                <p>no servía</p>
+                <p>porque a ella yo ya no tenía,</p>
+                <p>pues perdida tenía su vida,</p>
+                <p>pues <span class="highlight underline">amar ella no sabía.</span></p>
+            </section>
+            
+            <section class="estrofa">
+                 <p>Y aunque creí que podía</p>
+                <p>y que amar ella intentaría,</p>
+                <p>quién diría lo <span class="highlight strikethrough">equivocado</span> que</p>
+                <p>yo estaría.</p>
+            </section>
+
+            <section class="estrofa">
+                <svg class="doodle" id="doodle1" viewBox="0 0 100 100"><path d="M20,50 Q50,20 80,50 T 50,80 T20,50" stroke-dasharray="5,5" /></svg>
+                <p>Qué caro me costó ese beso,</p>
+                <p>ese beso que sabía a <span class="highlight circle">trozo de cielo. <svg class="circle-svg"><ellipse cx="50" cy="50" rx="45" ry="30"/></svg></span></p>
+                <p>un cielo que no era eterno,</p>
+                <p>ese cielo que alguna vez</p>
+                <p>no me perdia su amanecer</p>
+                <p>ahora espero su anochecer.</p>
+            </section>
+
+             <section class="estrofa">
+                <p>Me costó mi buen ver,</p>
+                <p>pues mi vista, cual <span class="highlight blurry">cámara dañada,</span></p>
+                <p>no podía ver qué parecer en mí había,</p>
+                <p>y mi voz, cual <span class="highlight">vocero sin voz,</span></p>
+                <p>mis <span class="highlight bleeding">labios sangrando</span></p>
+                <p>de amor cual cordero al matadero,</p>
+                <p>y mi amor, cual ciego que no entiende</p>
+                <p>un <span class="strikethrough">color.</span></p>
+            </section>
+
+            <section class="estrofa">
+                <svg class="doodle" id="doodle2" viewBox="0 0 100 100"><path d="M50,10 C90,10 90,90 50,90 C10,90 10,10 50,10" /></svg>
+                <p>Qué caro me costó</p>
+                <p>pensar en ti como nadie lo haría.</p>
+                <p>Pero... <span class="highlight underline">cuánto daría</span></p>
+                <p>por volver a la noche</p>
+                <p>en que de ti no sabía nada</p>
+                <p>y conocerte era mi mayor meta.</p>
+            </section>
+            
+            <section class="estrofa">
+                 <svg class="doodle" id="doodle3" viewBox="0 0 100 100"><path d="M20 20 L80 80 M80 20 L20 80 M50 10 V 90 M10 50 H 90" stroke-width="4" stroke-linecap="round"/></svg>
+                <p>Pero mostrarte amor</p>
+                <p>era como <span class="highlight circle">explicar un color al ciego.<svg class="circle-svg"><ellipse cx="50" cy="50" rx="45" ry="30"/></svg></span></p>
+                <p>Pues, ¿cómo explicas algo que necesita</p>
+                <p>ser visto a quien no puede ver?</p>
+                <p>¿Cómo te explicaba el amor, si</p>
+                <p>amor jamás habías visto?</p>
+            </section>
+
+             <section class="estrofa">
+                <p>Pero te amo,</p>
+                <p>aunque no entiendes qué es eso...</p>
+                <p>cual <span class="highlight">espíritu errante</span></p>
+                <p>se encuentra tu alma buscando</p>
+                <p>amor, pero al darte</p>
+                <p>no lo reconociste</p>
+                <p>pues no puedes reconocer</p>
+                <p>lo que jamás haz experimentado.</p>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+            } else {
+                body.classList.remove('dark-mode');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+            });
+
+            const estrofas = document.querySelectorAll('.estrofa');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const estrofa = entry.target;
+                        estrofa.classList.add('visible');
+                        
+                        const lines = estrofa.querySelectorAll('p');
+                        lines.forEach((line, index) => {
+                            line.style.transitionDelay = `${index * 150}ms`;
+                        });
+                        
+                        const highlights = estrofa.querySelectorAll('.underline, .strikethrough, .bleeding, .circle');
+                        highlights.forEach(highlight => {
+                             highlight.style.transitionDelay = `${lines.length * 150 + 200}ms`;
+                        });
+
+                        observer.unobserve(estrofa);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            estrofas.forEach(estrofa => observer.observe(estrofa));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Un Colorido Amor v2</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quattrocento:wght@400;700&family=Raleway:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* === INICIO: DEFINICIÓN DE TEMAS (MODO DÍA Y NOCHE) === */
+        :root {
+            --color-paper: #f4f1ea;
+            --color-text: #5c584f;
+            --color-heading: #3d3a33;
+            --color-bush: #5a7d58;
+            --color-blob1: rgba(229, 152, 155, 0.6);
+            --color-blob2: rgba(244, 211, 94, 0.6);
+            --color-blob3: rgba(168, 218, 220, 0.6);
+            --highlight-gradient: linear-gradient(90deg, #d95c61, #e39a3e, #4ea3aa);
+            --butterfly-wing-gradient: radial-gradient(circle, #f7b267, #f79d65, #f4845f);
+            
+            --font-serif: 'Quattrocento', serif;
+            --font-sans: 'Raleway', sans-serif;
+            --transition-speed: 0.5s;
+        }
+
+        body.dark-mode {
+            --color-paper: #0f1020;
+            --color-text: #a9b1d6;
+            --color-heading: #c0caf5;
+            --color-bush: #6a9568;
+            --color-blob1: rgba(186, 106, 196, 0.5);
+            --color-blob2: rgba(94, 138, 244, 0.5);
+            --color-blob3: rgba(100, 220, 200, 0.5);
+            --highlight-gradient: linear-gradient(90deg, #f7768e, #7dcfff, #bb9af7);
+            --butterfly-wing-gradient: radial-gradient(circle, #f7c776, #e0af68, #bb9af7);
+        }
+        /* === FIN: DEFINICIÓN DE TEMAS === */
+
+        body {
+            background-color: var(--color-paper);
+            color: var(--color-text);
+            font-family: var(--font-sans);
+            margin: 0;
+            overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* Ocultar cursor solo en dispositivos que no son táctiles */
+        @media (hover: hover) and (pointer: fine) {
+            body { cursor: none; }
+        }
+
+        #butterfly-cursor {
+            display: none; /* Oculto por defecto, se activa con JS si no es móvil */
+            position: fixed;
+            top: 0; left: 0; width: 50px; height: 50px;
+            z-index: 9999;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out;
+        }
+        /* (Estilos de alas de mariposa como antes) */
+        #butterfly-cursor .wing{position:absolute;width:50%;height:100%;background:var(--butterfly-wing-gradient);border-radius:5px 20px 20px 5px;}
+        #butterfly-cursor .left-wing{left:0;transform-origin:right center;animation:flap-left .3s infinite alternate ease-in-out;}
+        #butterfly-cursor .right-wing{right:0;transform-origin:left center;border-radius:20px 5px 5px 20px;animation:flap-right .3s infinite alternate ease-in-out;}
+        @keyframes flap-left{from{transform:rotateY(0deg)}to{transform:rotateY(60deg)}}
+        @keyframes flap-right{from{transform:rotateY(0deg)}to{transform:rotateY(-60deg)}}
+
+        /* === INICIO: MARIPOSAS LIBRES === */
+        #flying-butterflies-container {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0; pointer-events: none;
+        }
+
+        .flying-butterfly {
+            position: absolute;
+            width: 40px; height: 40px;
+            transform-origin: center;
+            /* La animación de ruta se asigna con JS */
+        }
+        .flying-butterfly .wing {
+             position:absolute;width:50%;height:100%;border-radius:5px 20px 20px 5px;
+        }
+        .flying-butterfly .left-wing{left:0;transform-origin:right center;animation:flap-left .3s infinite alternate ease-in-out;}
+        .flying-butterfly .right-wing{right:0;transform-origin:left center;border-radius:20px 5px 5px 20px;animation:flap-right .3s infinite alternate ease-in-out;}
+
+        @keyframes fly-path-1 { 0%{top:110%;left:-10%} 25%{transform:rotate(20deg)} 50%{transform:rotate(-10deg)} 100%{top:-10%;left:110%;transform:rotate(10deg)} }
+        @keyframes fly-path-2 { 0%{top:50%;left:-10%} 50%{transform:rotate(-20deg)} 100%{top:60%;left:110%;transform:rotate(25deg)} }
+        @keyframes fly-path-3 { 0%{top:-10%;left:80%} 40%{transform:rotate(15deg)} 100%{top:110%;left:70%;transform:rotate(-5deg)} }
+        /* === FIN: MARIPOSAS LIBRES === */
+
+        #watercolor-background {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden;
+        }
+        .color-blob {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0;
+            transition: opacity 2s ease-out, background-color var(--transition-speed);
+        }
+        #blob1 { width: 600px; height: 600px; top: 10%; left: 5%; background-color: var(--color-blob1); }
+        #blob2 { width: 500px; height: 500px; top: 20%; right: 10%; background-color: var(--color-blob2); }
+        #blob3 { width: 700px; height: 700px; bottom: 5%; left: 25%; background-color: var(--color-blob3); }
+
+        main, header {
+            position: relative; z-index: 1; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .content-wrapper { max-width: 650px; padding: 2rem; }
+        header { min-height: 100vh; justify-content: center; }
+        header h1 {
+            font-family: var(--font-serif); font-size: 3rem; font-weight: 700;
+            text-align: center; color: var(--color-heading);
+            transition: color var(--transition-speed);
+        }
+        
+        #bush-container { position:relative;width:200px;height:150px;margin:2rem auto; }
+        .leaf { position:absolute;width:80px;height:80px;background-color:var(--color-bush);border-radius:50% 0;transition:background-color var(--transition-speed), transform 0.5s ease-out;}
+        #leaf1{top:30%;left:10%;transform:rotate(-30deg)} #leaf2{top:30%;right:10%;transform:rotate(120deg)} #leaf3{top:0;left:30%;transform:rotate(20deg) scale(.9)}
+        #bush-container:hover .leaf{transform:scale(1.05)}
+        
+        /* === INICIO: SEPARACIÓN Y ANIMACIÓN DE ESTROFAS === */
+        .estrofa {
+            margin-bottom: 12rem; /* Mayor separación */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+        }
+        .estrofa.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* === FIN: SEPARACIÓN Y ANIMACIÓN DE ESTROFAS === */
+
+        .estrofa p {
+            font-size: 1.5rem; line-height: 1.9; margin: 1rem 0;
+            opacity: 0; filter: blur(5px); transform: translateY(10px);
+            transition: opacity 1s, filter 1s, transform 1s;
+            transition-timing-function: ease-out;
+        }
+        .estrofa.visible p { opacity: 1; filter: blur(0); transform: translateY(0); }
+
+        /* === INICIO: ESTILO DE FRASES RESALTADAS === */
+        .highlight {
+            font-family: var(--font-serif); /* Cambio de fuente */
+            font-weight: 700;
+            font-style: italic;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-image: var(--highlight-gradient);
+            background-size: 200% 100%;
+            animation: text-flow 5s infinite linear;
+        }
+
+        @keyframes text-flow {
+            from { background-position: 200% 0; }
+            to { background-position: 0 0; }
+        }
+        /* === FIN: ESTILO DE FRASES RESALTADAS === */
+
+        /* === INICIO: INTERRUPTOR DE MODO NOCHE === */
+        #theme-toggle {
+            position: fixed;
+            top: 20px; right: 20px;
+            z-index: 1000;
+            width: 45px; height: 45px;
+            background: rgba(128,128,128,0.1);
+            border: 1px solid rgba(128,128,128,0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s;
+        }
+        #theme-toggle:hover { transform: scale(1.1); }
+        #theme-toggle svg {
+            width: 24px; height: 24px;
+            color: var(--color-heading);
+            position: absolute;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        #sun-icon { opacity: 0; transform: rotate(-90deg); }
+        #moon-icon { opacity: 1; transform: rotate(0deg); }
+
+        body.dark-mode #sun-icon { opacity: 1; transform: rotate(0deg); }
+        body.dark-mode #moon-icon { opacity: 0; transform: rotate(90deg); }
+        /* === FIN: INTERRUPTOR DE MODO NOCHE === */
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.2rem; }
+            .estrofa { margin-bottom: 8rem; }
+            .estrofa p { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="flying-butterflies-container"></div>
+    <div id="butterfly-cursor">
+        <div class="wing left-wing"></div>
+        <div class="wing right-wing"></div>
+    </div>
+    
+    <button id="theme-toggle" title="Cambiar tema">
+        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+    </button>
+
+    <div id="watercolor-background">
+        <div class="color-blob" id="blob1"></div>
+        <div class="color-blob" id="blob2"></div>
+        <div class="color-blob" id="blob3"></div>
+    </div>
+
+    <main>
+        <div class="content-wrapper" id="content">
+            <header>
+                <h1>Un colorido amor</h1>
+            </header>
+
+            <section class="estrofa">
+                <p>Mientras divagaba en mi mente</p>
+                <p>Vi en el presente un arbusto</p>
+                <p>Lucia <span class="highlight">mágico</span></p>
+                <div id="bush-container">
+                    <div class="leaf" id="leaf1"></div>
+                    <div class="leaf" id="leaf2"></div>
+                    <div class="leaf" id="leaf3"></div>
+                </div>
+                <p>Sobre el se posaba una <span class="highlight">mariposa Tan hermosa...</span></p>
+            </section>
+
+            <section class="estrofa">
+                <p>Que terror me dio esa mariposa</p>
+                <p>Pues aprendi que si un animal</p>
+                <p>Es de <span class="highlight">colores vibrantes</span></p>
+                <p>Algo de <span class="highlight">venenoso</span> debe de tener</p>
+            </section>
+
+            <section class="estrofa">
+                <p>Se acerco y me toco</p>
+                <p>Senti una <span class="highlight">caricia</span></p>
+                <p>Como la <span class="highlight">brisa de primavera</span></p>
+                <p>Algo simple que senti <span class="highlight">hermoso</span></p>
+                <p>Pero me asuste al recordar</p>
+                <p>Y la intente espantar</p>
+            </section>
+            
+            <section class="estrofa">
+                <p>Que ingenuo -me dijo la mariposa-</p>
+                <p>Solo quiero mostrarte que debajo</p>
+                <p>De estos colores</p>
+                <p>Si hay <span class="highlight">paz</span></p>
+            </section>
+
+            <section class="estrofa">
+                <p>¿Paz? Ja ja ja</p>
+                <p>No la conozco -le mencione-</p>
+            </section>
+
+            <section class="estrofa">
+                <p>Con razon persigues aquello</p>
+                <p>Que te roba la paz y temes</p>
+                <p>A lo que parece bueno</p>
+                <p>Pues cuando probaste</p>
+                <p>Los colores no entendiste</p>
+                <p>Que en el <span class="highlight">espectro No todos son iguales</span></p>
+            </section>
+
+            <section class="estrofa">
+                <p>¿A que te refieres?</p>
+                <p>Pregunto curioso</p>
+            </section>
+            
+            <section class="estrofa">
+                <p>Tu temes por que jamas te han amado</p>
+                <p>En tan <span class="highlight">vibrante tono</span></p>
+                <p>Ni siquiera en un tono...</p>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            // --- LÓGICA DE LA MARIPOSA (CURSOR) ---
+            if (!isTouchDevice) {
+                const butterflyCursor = document.getElementById('butterfly-cursor');
+                butterflyCursor.style.display = 'block';
+                let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+                let butterflyX = mouseX, butterflyY = mouseY;
+                
+                document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+                
+                function animateButterflyCursor() {
+                    butterflyX += (mouseX - butterflyX) * 0.1;
+                    butterflyY += (mouseY - butterflyY) * 0.1;
+                    butterflyCursor.style.transform = `translate(${butterflyX}px, ${butterflyY}px)`;
+                    requestAnimationFrame(animateButterflyCursor);
+                }
+                animateButterflyCursor();
+            }
+            
+            // --- GENERADOR DE MARIPOSAS LIBRES ---
+            const butterflyContainer = document.getElementById('flying-butterflies-container');
+            const butterflyColors = ['#e4717a', '#f7b267', '#a8dadc', '#bb9af7'];
+            for (let i = 0; i < 4; i++) {
+                const bfly = document.createElement('div');
+                bfly.className = 'flying-butterfly';
+                bfly.innerHTML = `<div class="wing left-wing"></div><div class="wing right-wing"></div>`;
+                bfly.style.animation = `fly-path-${(i % 3) + 1} ${15 + Math.random() * 10}s linear infinite`;
+                bfly.style.animationDelay = `${Math.random() * 5}s`;
+                
+                const wings = bfly.querySelectorAll('.wing');
+                wings.forEach(wing => wing.style.background = butterflyColors[i % butterflyColors.length]);
+                
+                butterflyContainer.appendChild(bfly);
+            }
+
+            // --- LÓGICA DEL MODO NOCHE ---
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            // Revisa si el usuario ya tenía una preferencia
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+            }
+
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                // Guarda la preferencia para futuras visitas
+                if (body.classList.contains('dark-mode')) {
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+
+            // --- LÓGICA DE SCROLL PARA COLORES ---
+            const blobs = document.querySelectorAll('.color-blob');
+            function handleScroll() {
+                const scrollTotal = document.body.scrollHeight - window.innerHeight;
+                if (scrollTotal <= 0) return;
+                const scrollPercent = Math.min(window.scrollY / scrollTotal, 1);
+                
+                if (scrollPercent > 0.05) blobs[0].style.opacity = '1';
+                if (scrollPercent > 0.25) blobs[1].style.opacity = '1';
+                if (scrollPercent > 0.45) blobs[2].style.opacity = '1';
+            }
+            window.addEventListener('scroll', handleScroll, { passive: true });
+
+            // --- LÓGICA DE APARICIÓN DE ESTROFAS Y TEXTO ---
+            const estrofas = document.querySelectorAll('.estrofa');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const estrofa = entry.target;
+                        estrofa.classList.add('visible');
+                        
+                        estrofa.querySelectorAll('p').forEach((p, index) => {
+                            p.style.transitionDelay = `${200 + index * 100}ms`; // Retraso inicial para que la estrofa entre primero
+                        });
+                        
+                        observer.unobserve(estrofa);
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            estrofas.forEach(estrofa => observer.observe(estrofa));
+
+        });
+    </script>
+</body>
+</html>

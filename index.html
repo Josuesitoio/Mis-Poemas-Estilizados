@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poesía en el Viento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <script>
+      // Configuración de Tailwind para extender colores y fuentes
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              'cream': '#FDF6E3',
+              'dark-blue': '#0A192F',
+              'burgundy': '#800020',
+              'soft-gold': '#D4AF37',
+            },
+            fontFamily: {
+              'serif': ['Merriweather', 'serif'],
+              'sans': ['Lato', 'sans-serif'],
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+        /* Variables de color de apoyo */
+        :root {
+            --firefly-color: #D4AF37;
+        }
+
+        /* --- Animación de Entrada para tarjetas y títulos --- */
+        .stanza {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .stanza.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /*
+         * =============================================================
+         * CSS PARA LUCIÉRNAGAS CONTENIDAS DENTRO DE UNA TARJETA
+         * =============================================================
+        */
+        .firefly-card-bg {
+            /* Contenedor principal de las luciérnagas, posicionado para llenar la tarjeta padre */
+            position: absolute;
+            inset: 0; /* equivale a top: 0; right: 0; bottom: 0; left: 0; */
+            z-index: 0; /* Se asegura que esté detrás del contenido */
+        }
+
+        .firefly {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--firefly-color);
+            /* Animaciones de movimiento y parpadeo */
+            animation: drift 10s infinite ease-in-out, pulse 3s infinite ease-in-out;
+        }
+
+        /* Animación de movimiento ADAPTADA A PORCENTAJES (%) para que sea relativa a la tarjeta */
+        @keyframes drift {
+            0% { transform: translate(0, 0); opacity: 1; }
+            20% { transform: translate(calc(var(--i) * 15%), calc(var(--i) * -20%)); }
+            40% { transform: translate(calc(var(--i) * -10%), calc(var(--i) * -40%)); }
+            60% { transform: translate(calc(var(--i) * 25%), calc(var(--i) * -60%)); }
+            80% { transform: translate(calc(var(--i) * -5%), calc(var(--i) * -80%)); }
+            100% { transform: translate(calc(var(--i) * 10%), -150%); opacity: 0; }
+        }
+
+        /* Animación de parpadeo (reducido el brillo para un efecto más sutil en un espacio pequeño) */
+        @keyframes pulse {
+            0%, 100% { opacity: 0; box-shadow: none; }
+            50% { opacity: 1; box-shadow: 0 0 6px var(--firefly-color), 0 0 12px var(--firefly-color); }
+        }
+
+        /* --- Partículas del Footer --- */
+        .particle {
+            position: absolute;
+            background-color: rgba(128, 128, 128, 0.2);
+            border-radius: 50%;
+            animation: rise 20s infinite linear;
+            bottom: 0;
+        }
+        @keyframes rise {
+            to {
+                transform: translateY(-100vh);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-cream font-sans text-dark-blue dark:bg-dark-blue dark:text-cream transition-colors duration-500">
+
+    <nav class="fixed top-0 left-0 w-full bg-cream/80 dark:bg-dark-blue/80 backdrop-blur-sm shadow-md z-50 transition-colors duration-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#" class="font-bold text-xl text-burgundy dark:text-soft-gold">Poesía en el Viento</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-soft-gold/20 dark:hover:bg-cream/20">Inicio</a>
+                    <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-soft-gold/20 dark:hover:bg-cream/20">Poemas</a>
+                    <button id="darkModeToggle" class="p-2 rounded-full hover:bg-soft-gold/20 dark:hover:bg-cream/20">
+                        <span id="theme-icon-container"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24 pb-16 min-h-screen">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl md:text-5xl font-serif text-center font-bold text-burgundy dark:text-soft-gold mb-12 stanza">
+                Colección de Poemas
+            </h1>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+
+                <div class="relative rounded-lg overflow-hidden transition-all duration-300 transform hover:scale-105 stanza" style="transition-delay: 100ms;">
+                    <div class="firefly-card-bg">
+                        <div class="firefly" style="--i: 1; width: 3px; height: 3px; top: 85%; left: 10%; animation-delay: 0s;"></div>
+                        <div class="firefly" style="--i: -1; width: 4px; height: 4px; top: 90%; left: 35%; animation-delay: 1.5s;"></div>
+                        <div class="firefly" style="--i: 1; width: 3px; height: 3px; top: 80%; left: 50%; animation-delay: 3s;"></div>
+                        <div class="firefly" style="--i: -1; width: 2px; height: 2px; top: 95%; left: 75%; animation-delay: 4.5s;"></div>
+                        <div class="firefly" style="--i: 1; width: 4px; height: 4px; top: 88%; left: 90%; animation-delay: 6s;"></div>
+                    </div>
+                    <div class="relative z-10 h-full rounded-md p-6 flex flex-col bg-cream/80 dark:bg-dark-blue/80 backdrop-blur-sm border border-dark-blue/10 dark:border-cream/10">
+                        <h3 class="text-3xl font-bold text-burgundy dark:text-soft-gold">Φαντασος</h3>
+                        <p class="mt-4 flex-grow opacity-90 text-gray-700 dark:text-gray-300">
+                            Si en la vigilia ya no existe,
+                            que al menos en los sueños regrese.
+                        </p>
+                        <a href="poema1.html" class="mt-6 self-start font-bold text-soft-gold hover:underline">
+                            Leer completo &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <div class="relative group bg-cream dark:bg-dark-blue/80 border border-dark-blue/10 dark:border-cream/10 rounded-lg p-6 overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-burgundy/20 dark:hover:shadow-soft-gold/10 stanza" style="transition-delay: 200ms;">
+                    <div class="absolute -top-10 -right-10 w-32 h-32 bg-burgundy/20 dark:bg-soft-gold/10 rounded-full transition-transform duration-500 group-hover:scale-125"></div>
+                    <div class="absolute -bottom-12 -left-8 w-40 h-40 bg-dark-blue/10 dark:bg-cream/5 rounded-3xl transform rotate-45 transition-transform duration-500 group-hover:rotate-90"></div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <h2 class="text-2xl font-serif font-bold text-burgundy dark:text-soft-gold">Museo del Reflejo Roto</h2>
+                        <p class="mt-4 text-gray-700 dark:text-gray-300 flex-grow">
+                            ...brillaba por algo que reflejaba en ella, y jamás por ella misma.
+                        </p>
+                        <a href="poema2.html" class="mt-6 self-start font-bold text-soft-gold dark:text-cream hover:underline">
+                            Leer completo &rarr;
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="relative group bg-cream dark:bg-dark-blue/80 border border-dark-blue/10 dark:border-cream/10 rounded-lg p-6 overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl stanza" style="transition-delay: 300ms;">
+                    <div class="absolute top-0 left-0 w-40 h-40 bg-pink-300/50 dark:bg-pink-400/30 rounded-full blur-2xl transition-all duration-500 group-hover:scale-150"></div>
+                    <div class="absolute bottom-0 right-0 w-32 h-32 bg-yellow-300/50 dark:bg-yellow-400/30 rounded-full blur-2xl transition-all duration-500 delay-100 group-hover:scale-150"></div>
+                    <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-blue-300/50 dark:bg-blue-400/30 rounded-full blur-2xl transition-all duration-500 delay-200 group-hover:scale-150"></div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <h2 class="text-2xl font-serif font-bold text-burgundy dark:text-soft-gold">Un colorido amor</h2>
+                        <p class="mt-4 text-gray-700 dark:text-gray-300 flex-grow">
+                           Solo quiero mostrarte que debajo de estos colores, si hay paz.
+                        </p>
+                        <a href="Poema3.html" class="mt-6 self-start font-bold text-soft-gold dark:text-cream hover:underline">
+                            Leer completo &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <div class="relative group bg-cream dark:bg-dark-blue/90 border border-dark-blue/10 dark:border-cream/10 rounded-lg p-6 overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl stanza" style="transition-delay: 100ms; background-image: repeating-linear-gradient(to bottom, transparent, transparent 1.74rem, rgba(180, 200, 230, 0.5) 1.74rem, rgba(180, 200, 230, 0.5) 1.76rem); background-size: 100% 1.76rem;">
+                    <div class="absolute top-4 left-4 h-[calc(100%-2rem)] w-[1.5px] bg-red-300/70"></div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <h2 class="text-2xl font-serif font-bold text-burgundy dark:text-soft-gold" style="font-family: 'Merriweather', serif;">NVAPETMQY</h2>
+                        <p class="mt-4 text-gray-700 dark:text-gray-300 flex-grow font-serif italic" style="font-family: 'Merriweather', serif; line-height: 1.75rem;">
+                            ...era como explicar un color al ciego.
+                        </p>
+                        <a href="poema4.html" class="mt-6 self-start font-bold text-soft-gold dark:text-cream hover:underline">
+                            Leer completo &rarr;
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="relative group bg-cream dark:bg-dark-blue/80 border border-dark-blue/10 dark:border-cream/10 rounded-lg p-6 overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl stanza" style="transition-delay: 200ms;">
+                     <div class="absolute inset-0 bg-[repeating-linear-gradient(-45deg,transparent,transparent_10px,rgba(128,128,128,0.05)_10px,rgba(128,128,128,0.05)_11px)] opacity-50"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-burgundy/80 dark:bg-burgundy rounded-full blur-2xl opacity-40 group-hover:opacity-60 transition-opacity"></div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <h2 class="text-2xl font-serif font-bold text-burgundy dark:text-soft-gold">Sudor y púas</h2>
+                        <p class="mt-4 text-gray-700 dark:text-gray-300 flex-grow">
+                           ...el sudor nunca fue tal, sino el derrame profundo de un amor en rojo.
+                        </p>
+                        <a href="poema5.html" class="mt-6 self-start font-bold text-soft-gold dark:text-cream hover:underline">
+                            Leer completo &rarr;
+                        </a>
+                    </div>
+                </div>
+
+                <div class="relative group bg-dark-blue border border-cream/10 rounded-lg p-6 overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-burgundy/20 dark:hover:shadow-soft-gold/10 stanza" style="transition-delay: 300ms;">
+                    <div class="absolute inset-0 z-0">
+                        <svg width="100%" height="100%" preserveAspectRatio="none">
+                            <path d="M-10,10 C40,80 80,20 120,100 S 180,220 140,280" stroke="#800020" stroke-width="2" fill="none" class="opacity-40 dark:opacity-70" />
+                            <path d="M150,5 C100,50 50,120 20,200 S 80,280 150,300" stroke="#800020" stroke-width="1.5" fill="none" class="opacity-30 dark:opacity-60" />
+                        </svg>
+                    </div>
+                    <div class="relative z-10 flex flex-col h-full">
+                        <h2 class="text-2xl font-serif font-bold text-soft-gold">Cuan conciente es un hilo</h2>
+                        <p class="mt-4 text-gray-300 flex-grow">
+                           El contesto, ella jamás ato aquel nudo. Siempre fuiste tu...
+                        </p>
+                        <a href="poema6.html" class="mt-6 self-start font-bold text-soft-gold hover:underline">
+                            Leer completo &rarr;
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer class="relative bg-gray-200 dark:bg-gray-900 py-8 overflow-hidden">
+        <div id="footer-particles" class="absolute top-0 left-0 w-full h-full z-0"></div>
+        <div class="text-center text-gray-600 dark:text-gray-400 relative z-10">
+            <p>&copy; 2025 Poesía en el Viento. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- LÓGICA DEL MODO OSCURO ---
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const themeIconContainer = document.getElementById('theme-icon-container');
+        const sunIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`;
+        const moonIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`;
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                themeIconContainer.innerHTML = sunIcon;
+            } else {
+                document.documentElement.classList.remove('dark');
+                themeIconContainer.innerHTML = moonIcon;
+            }
+        };
+        const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        applyTheme(savedTheme);
+        darkModeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            const newTheme = isDark ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+
+        // --- LÓGICA PARA ANIMACIONES DE ENTRADA (SCROLL) ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.stanza').forEach(el => observer.observe(el));
+
+        // --- LÓGICA PARA PARTÍCULAS DEL FOOTER ---
+        const footerParticlesContainer = document.getElementById('footer-particles');
+        if (footerParticlesContainer) {
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.width = `${Math.random() * 3 + 1}px`;
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = `${Math.random() * 20}s`;
+                particle.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                footerParticlesContainer.appendChild(particle);
+            }
+        }
+    });
+    </script>
+</body>
+</html>

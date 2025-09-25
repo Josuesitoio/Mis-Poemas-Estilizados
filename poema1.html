@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museo Virtual de Poesía: Φαντασος</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* -------------------------------------------
+        --- CONFIGURACIÓN GENERAL Y PERSONALIZACIÓN ---
+        ------------------------------------------- */
+        :root {
+            /* Paleta de Colores - Tema Claro */
+            --color-bg: #FDF6E3; /* Crema */
+            --color-text: #2c3e50; /* Azul oscuro suave */
+            --color-title: #8B0000; /* Burdeos */
+            --color-accent: #D4AF37; /* Dorado suave */
+            --color-highlight-glow: #D4AF37;
+            --firefly-color: #f7b733; /* Amarillo dorado para luciérnagas */
+
+            /* Tipografía */
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+        }
+
+        .dark {
+            /* Paleta de Colores - Tema Oscuro */
+            --color-bg: #0d1117; /* Negro/Azul muy oscuro para el fondo */
+            --color-text: #E2E8F0; /* Crema/Blanco suave */
+            --color-title: #f7b733; /* Dorado brillante */
+            --color-accent: #c084fc; /* Lavanda (acento en modo oscuro) */
+            --color-highlight-glow: #c084fc;
+        }
+
+        /* -----------------------------
+        --- ESTILOS BASE Y FONDO ---
+        ----------------------------- */
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-sans);
+            transition: background-color 0.5s ease, color 0.5s ease;
+            overflow-x: hidden;
+        }
+        
+        #particle-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* ---------------------------------
+        --- NUEVO EFECTO: LUCIÉRNAGAS ---
+        --------------------------------- */
+
+        .firefly {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--firefly-color);
+            /* Dos animaciones: una para el movimiento (drift) y otra para el parpadeo (pulse) */
+            animation: drift 20s infinite ease-in-out, pulse 4s infinite ease-in-out;
+        }
+
+        /* Animación para el movimiento errático de la luciérnaga */
+        @keyframes drift {
+            0% { transform: translate(0, 0); }
+            20% { transform: translate(calc(var(--i) * 3vw), calc(var(--i) * -4vh)); }
+            40% { transform: translate(calc(var(--i) * -2vw), calc(var(--i) * -8vh)); }
+            60% { transform: translate(calc(var(--i) * 4vw), calc(var(--i) * -12vh)); }
+            80% { transform: translate(calc(var(--i) * -1vw), calc(var(--i) * -16vh)); }
+            100% { transform: translate(calc(var(--i) * 2vw), -110vh); }
+        }
+
+        /* Animación para el parpadeo de la luz */
+        @keyframes pulse {
+            0%, 100% { opacity: 0; box-shadow: none; }
+            50% { opacity: 1; box-shadow: 0 0 8px var(--firefly-color), 0 0 16px var(--firefly-color); }
+            55% { opacity: 0.2; box-shadow: 0 0 4px var(--firefly-color); }
+            65% { opacity: 0.8; box-shadow: 0 0 7px var(--firefly-color), 0 0 14px var(--firefly-color); }
+        }
+
+        /*
+        Configuración individual de cada luciérnaga.
+        Ajustamos tamaño, posición inicial, y delays/duraciones de las animaciones
+        para que no se muevan todas al mismo tiempo.
+        La variable '--i' ayuda a individualizar la animación de movimiento.
+        */
+        .firefly:nth-child(1)  { --i: 1; width: 4px; height: 4px; top: 85vh; left: 10vw; animation-delay: 0s; animation-duration: 25s, 3.5s; }
+        .firefly:nth-child(2)  { --i: -1; width: 6px; height: 6px; top: 90vh; left: 25vw; animation-delay: 2s; animation-duration: 20s, 5s; }
+        .firefly:nth-child(3)  { --i: 1; width: 3px; height: 3px; top: 80vh; left: 40vw; animation-delay: 4s; animation-duration: 30s, 4s; }
+        .firefly:nth-child(4)  { --i: -1; width: 5px; height: 5px; top: 95vh; left: 55vw; animation-delay: 7s; animation-duration: 22s, 3s; }
+        .firefly:nth-child(5)  { --i: 1; width: 6px; height: 6px; top: 88vh; left: 70vw; animation-delay: 9s; animation-duration: 28s, 4.5s; }
+        .firefly:nth-child(6)  { --i: -1; width: 4px; height: 4px; top: 92vh; left: 85vw; animation-delay: 12s; animation-duration: 19s, 5.2s; }
+        .firefly:nth-child(7)  { --i: 1; width: 3px; height: 3px; top: 82vh; left: 5vw; animation-delay: 15s; animation-duration: 24s, 3.8s; }
+        .firefly:nth-child(8)  { --i: -1; width: 5px; height: 5px; top: 98vh; left: 90vw; animation-delay: 1s; animation-duration: 26s, 4.2s; }
+        .firefly:nth-child(9)  { --i: 1; width: 4px; height: 4px; top: 86vh; left: 15vw; animation-delay: 6s; animation-duration: 23s, 3.3s; }
+        .firefly:nth-child(10) { --i: -1; width: 7px; height: 7px; top: 84vh; left: 30vw; animation-delay: 10s; animation-duration: 32s, 5.5s; }
+        .firefly:nth-child(11) { --i: 1; width: 3px; height: 3px; top: 93vh; left: 50vw; animation-delay: 3s; animation-duration: 27s, 4.8s; }
+        .firefly:nth-child(12) { --i: -1; width: 5px; height: 5px; top: 81vh; left: 75vw; animation-delay: 8s; animation-duration: 21s, 3.6s; }
+        
+        /* ---------------------------------
+        --- ESTILOS DE TIPOGRAFÍA Y UI ---
+        --------------------------------- */
+        h1, h2 {
+            font-family: var(--font-serif);
+            color: var(--color-title);
+        }
+        .poem-text {
+            font-family: var(--font-serif);
+            white-space: pre-wrap;
+        }
+        .title-frame {
+            position: relative;
+            padding: 1rem;
+            display: inline-block;
+        }
+        .title-frame::before, .title-frame::after {
+            content: ''; position: absolute; width: 0%; height: 2px;
+            background-color: var(--color-accent); transition: width 1s ease-in-out;
+        }
+        .title-frame::before { top: 0; left: 0; }
+        .title-frame::after { bottom: 0; right: 0; }
+        .title-frame.is-visible::before, .title-frame.is-visible::after { width: 100%; }
+
+        /* -------------------------------------------------
+        --- ANIMACIONES Y EFECTOS DE RESALTADO DE TEXTO ---
+        ------------------------------------------------- */
+        .stanza {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 1.2s cubic-bezier(0.165, 0.84, 0.44, 1), transform 1.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .stanza.is-visible { opacity: 1; transform: translateY(0); }
+        .highlight-glow { animation: glow 3s ease-in-out infinite alternate; transition: text-shadow 0.3s ease; }
+        @keyframes glow {
+            from { text-shadow: 0 0 2px var(--color-highlight-glow), 0 0 5px var(--color-highlight-glow); }
+            to { text-shadow: 0 0 8px var(--color-highlight-glow), 0 0 15px var(--color-highlight-glow); }
+        }
+        .highlight-color { color: var(--color-title); font-style: italic; transition: color 0.5s ease; }
+        .highlight-breathe { animation: breathe 4s ease-in-out infinite; }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .highlight-underline {
+            background-image: linear-gradient(var(--color-accent), var(--color-accent)); background-size: 0% 2px;
+            background-repeat: no-repeat; background-position: left bottom; transition: background-size 0.5s ease-in-out;
+        }
+        .is-visible .highlight-underline { background-size: 100% 2px; }
+
+        /* -----------------------------
+        --- ACCESIBILIDAD ---
+        ----------------------------- */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation-duration: 1ms !important; animation-iteration-count: 1 !important;
+                transition-duration: 1ms !important; scroll-behavior: auto !important;
+            }
+        }
+        .theme-toggle:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="particle-container">
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+        <div class="firefly"></div> <div class="firefly"></div> <div class="firefly"></div>
+    </div>
+    
+    <button id="theme-toggle" aria-label="Cambiar entre modo claro y oscuro" class="theme-toggle fixed top-4 right-4 z-50 p-2 rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-sm transition-all duration-300 hover:scale-110">
+        <svg id="theme-toggle-light-icon" class="w-6 h-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        <svg id="theme-toggle-dark-icon" class="w-6 h-6 text-indigo-300 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+    </button>
+
+    <main class="relative z-10 p-4 sm:p-8">
+        <header class="min-h-screen flex flex-col items-center justify-center text-center py-20">
+            <div class="title-frame stanza">
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter">
+                    Φαντασος
+                </h1>
+            </div>
+            <p class="stanza mt-6 text-lg md:text-xl max-w-2xl" style="transition-delay: 200ms;">
+                Un viaje interactivo a través de los sueños y las sombras del alma.
+            </p>
+            <div class="stanza mt-12 animate-bounce" style="transition-delay: 400ms;">
+                <svg class="w-8 h-8 mx-auto" style="color: var(--color-accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+            </div>
+        </header>
+
+        <article class="mx-auto max-w-prose text-xl md:text-2xl leading-loose poem-text">
+            
+            <p class="stanza mb-16">
+—Hola —dije temeroso a aquella mujer
+Que su <span class="highlight-underline">rostro difuso</span> parecer tenía—
+—¿Eres tú? 
+Sin respuesta le seguí
+Sin mirar que todo perfecto era
+La tenía a ella
+Y no me había perdido a mí
+            </p>
+
+            <p class="stanza mb-16">
+Un <span class="highlight-color">floreado jardín</span>
+Que el marchitar no conocía
+Un lobo que abrazaba una oveja
+Y el niño que con su serpiente jugaba
+Algo que me inspiraba
+Pero entonces la vi...
+Perfecta como cuando me fui.
+            </p>
+
+            <p class="stanza mb-16">
+Un hermoso jardín de fresas vi
+Entre ellas la que yo amaba
+Cuán <span class="highlight-breathe">perfecta</span> era
+Cual persona salida de <span class="highlight-glow">lo onírico</span>
+Se veía
+            </p>
+
+            <p class="stanza mb-16">
+La abracé y me abrazó
+La besé y me besó
+El cielo aplaudió
+Y el rico envidió
+El pobre
+—¿Y el pobre? ¿Y el infierno?
+Qué extraño —pensé—
+            </p>
+
+            <p class="stanza mb-16">
+Pero qué importaba
+Si a mi lado se encontraba aquella
+Que mi alma anhela
+Cual <span class="highlight-underline">flor sin marchitar...</span>
+            </p>
+
+            <p class="stanza mb-16">
+Aunque su rostro no alcanzó a ver
+Su aroma yo puedo reconocer
+Sus tan hermosos <span class="highlight-glow">ojos vacíos</span>
+—¿Vacíos? —dije al viento
+—¿Mi amada? ¿Dónde está mi amada?
+—grité con desesperación—
+Qué extraña es el alma que parece ciega
+Pero ve lo que yo no veo
+Y siente lo que yo no puedo.
+            </p>
+
+            <p class="stanza mb-16">
+Al aparecer frente a mí
+Entendí que parecer en ella no había
+Pues a quien yo amaba sabía
+<span class="highlight-color">Jamás volvería</span>
+            </p>
+
+            <p class="stanza mb-16">
+—¿Quién eres? Ya sé que no eres ella
+Pues ahora parecer tenía
+Reconocí su rostro
+Cual artista que conoce su arte
+Pero <span class="highlight-underline">calor en su abrazo no había</span>
+—Qué estúpido —dijo aquella cosa molesta—
+Estuviste a nada de tenerlo todo
+—¿Todo? Tú no eres a quien yo amo
+Pero su rostro cambio
+Pues ahora
+Su transformado rostro
+Ese rostro que ahora evoca miedo
+Ahora <span class="highlight-breathe">humanidad no habia en ella</span>
+Una <span class="highlight-glow">bestia</span> ahora era ella
+Al fin veia quien de verdad era.
+            </p>
+
+            <p class="stanza mb-16">
+Al despertar algo cambió
+Ya no estaba ella pues aunque
+Jamás fue ella yo sentía que lo era
+            </p>
+            
+            <p class="stanza mb-16">
+Si en la vigilia ya no existe,
+que al menos en los sueños regrese.
+            </p>
+
+            <p class="stanza mb-16">
+Aunque <span class="highlight-color">Phantasos</span> ría de mi desconsuelo,
+pues el mundo perfecto me mostro iy que en
+sus vagas señales me engañó sobre encontrarla
+            </p>
+            
+            <p class="stanza mb-16">
+Y aunque <span class="highlight-color">Morpheus</span>
+ese hermoso rostro mostrara
+aquel rostro de la que amaba
+Sabiendo que no era ella
+            </p>
+            
+            <p class="stanza mb-16">
+<span class="highlight-color">Phobetor</span> quien me mostró
+lo tierno con lo peligroso
+la inocencia y el veneno
+y el verdadero rostro de quien
+Yo amaba
+Aún con todo eso yo volveré
+Volveré a buscarla en la niebla,
+aun sabiendo que <span class="highlight-underline">nunca será ella</span>
+Y aunque abrazo falso tenga
+Y pierda la cordura
+Aún espero que mi amada sea
+A quien yo tenga hasta mi sepultura.
+            </p>
+
+        </article>
+
+        <footer class="text-center py-16 stanza">
+            <p class="text-sm" style="color: var(--color-text); opacity: 0.7;">
+                Fin del viaje onírico.
+            </p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const lightIcon = document.getElementById('theme-toggle-light-icon');
+            const darkIcon = document.getElementById('theme-toggle-dark-icon');
+            const applyTheme = (theme) => {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    lightIcon.classList.add('hidden');
+                    darkIcon.classList.remove('hidden');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    lightIcon.classList.remove('hidden');
+                    darkIcon.classList.add('hidden');
+                }
+            };
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+            applyTheme(initialTheme);
+            themeToggleBtn.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.toggle('dark');
+                const newTheme = isDark ? 'dark' : 'light';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+            const observerOptions = {
+                root: null, rootMargin: '0px 0px -15% 0px', threshold: 0
+            };
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            const targets = document.querySelectorAll('.stanza');
+            targets.forEach(target => { observer.observe(target); });
+        });
+    </script>
+
+</body>
+</html>

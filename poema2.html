@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Espejo Fragmentado</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --color-background: #020205; /* Un negro casi absoluto */
+            --color-text: #d8dee9;
+            --color-glow-subtle: rgba(172, 193, 230, 0.1);
+            --color-glow-highlight: rgba(172, 193, 230, 0.7);
+            --font-serif: 'Playfair Display', serif; /* Cambiado a una fuente más dramática */
+            --font-alt-serif: 'Lora', serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--color-background);
+            color: var(--color-text);
+            font-family: var(--font-alt-serif);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* === INICIO: NUEVO FONDO DE CRISTALES 3D === */
+        #shard-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            perspective: 500px; /* Activa el espacio 3D */
+            overflow: hidden;
+        }
+
+        .shard {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transform-style: preserve-3d;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+
+        /* Diferentes formas de cristales usando clip-path */
+        .shard.shape1 { clip-path: polygon(0% 15%, 15% 0%, 100% 50%, 85% 100%, 20% 90%); }
+        .shard.shape2 { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+        .shard.shape3 { clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
+        .shard.shape4 { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+
+        @keyframes float {
+            from { transform: translate3d(var(--x-start), var(--y-start), var(--z-start)) rotateX(0deg) rotateY(0deg); }
+            to { transform: translate3d(var(--x-end), var(--y-end), var(--z-start)) rotateX(360deg) rotateY(360deg); }
+        }
+        /* === FIN: FONDO DE CRISTALES 3D === */
+        
+        main, header {
+            position: relative; /* Para que esté por encima del fondo */
+            z-index: 1;
+        }
+        
+        .page-header {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: var(--font-serif);
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 25px var(--color-glow-highlight);
+        }
+
+        #poema-museo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .estrofa {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 700px;
+            padding: 2rem;
+            margin-bottom: 10rem;
+        }
+
+        /* === INICIO: NUEVA ANIMACIÓN DE TEXTO === */
+        .estrofa p {
+            font-size: 2rem;
+            line-height: 1.9;
+            margin: 0.8rem 0;
+            font-weight: 400;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: materialize 1s forwards cubic-bezier(0.165, 0.84, 0.44, 1);
+            animation-play-state: paused; /* La animación no corre hasta que se hace visible */
+        }
+        
+        .estrofa.visible p {
+            animation-play-state: running;
+        }
+
+        @keyframes materialize {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+                clip-path: inset(50% 0 50% 0);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+                clip-path: inset(0% 0% 0% 0%);
+            }
+        }
+        /* === FIN: NUEVA ANIMACIÓN DE TEXTO === */
+
+        /* === INICIO: NUEVO RESALTADO "LUZ ATRAPADA" === */
+        .highlight {
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-style: italic;
+            
+            /* La magia: el texto es transparente, mostramos el fondo */
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            
+            background-image: linear-gradient(90deg, #d8aeeB, #a2b2e8, #aed3e6, #a2b2e8, #d8aeeB);
+            background-size: 200% 100%;
+            animation: liquid-light 5s infinite linear;
+        }
+        
+        @keyframes liquid-light {
+            from { background-position: 200% 0; }
+            to { background-position: 0 0; }
+        }
+        /* === FIN: NUEVO RESALTADO "LUZ ATRAPADA" === */
+
+        .ui-controls {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+        }
+
+        .control-button {
+            background: rgba(10, 10, 15, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            padding: 0;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+        
+        .control-button.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .control-button:hover {
+            transform: scale(1.1);
+            border-color: #fff;
+        }
+
+        .control-button svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 2.2rem; padding: 0 1rem; }
+            .estrofa { margin-bottom: 5rem; }
+            .estrofa p { font-size: 1.5rem; line-height: 1.8; }
+            .ui-controls { bottom: 1rem; right: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="shard-container">
+        </div>
+
+    <div class="ui-controls">
+        <button id="home-button" class="control-button" title="Volver al inicio" aria-label="Volver al inicio">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg>
+        </button>
+    </div>
+
+    <header class="page-header">
+        <h1>El valle del olvido</h1>
+    </header>
+
+    <main id="poema-museo">
+        <section class="estrofa">
+            <p>En el <span class="highlight">valle del olvido</span></p>
+            <p>Vi <span class="highlight">tu rostro.</span></p>
+            <p>Qué curioso -pense-</p>
+            <p>¿Quién es esa <span class="highlight">bella, pero cortada mujer?</span></p>
+        </section>
+        <section class="estrofa">
+            <p>Luce hermosa,</p>
+            <p>aunque tiene <span class="highlight">cristales incrustados</span></p>
+            <p>en todo su rostro.</p>
+        </section>
+        <section class="estrofa">
+            <p>Hey! -grité-</p>
+            <p>Pero al voltear,</p>
+            <p><span class="highlight">mi reflejo</span> bailaba en cada cristal,</p>
+            <p>como perro tras su propia sombra.</p>
+        </section>
+        <section class="estrofa">
+            <p>Corrí y pude ver</p>
+            <p>que en esos <span class="highlight">espejos</span> aparecía ella.</p>
+        </section>
+        <section class="estrofa">
+            <p>-¿Quién eres? -pregunto, ingenuo.-</p>
+            <p>-<span class="highlight">Soy quien te rompió</span> -respondió-</p>
+        </section>
+        <section class="estrofa">
+            <p>A mi parecer, <span class="highlight">rota estaba ella;</span></p>
+            <p>pues aunque brillante se veía,</p>
+            <p>no entendía</p>
+            <p>que <span class="highlight">brillaba por algo que reflejaba en ella,</span></p>
+            <p><span class="highlight">y jamás por ella misma.</span></p>
+        </section>
+        <section class="estrofa">
+            <p>Qué extraña es la luz -pensé-</p>
+            <p>que <span class="highlight">ciega y arrastra.</span></p>
+        </section>
+        <section class="estrofa">
+            <p>Ese <span class="highlight">rostro cortado, con pedazos de cristal, desmoronándose</span>,</p>
+            <p>en el <span class="highlight">valle del olvido</span>,</p>
+            <p>debería quedarse allí…</p>
+            <p>¿Pero por qué me atrae esa desconocida?</p>
+        </section>
+        <section class="estrofa">
+            <p>-<span class="highlight">Te amo</span> -me dijo-</p>
+            <p>pero, ¿cómo puedes amar si rota estás?</p>
+            <p>Acaso me dirás que a amar aprendiste,</p>
+            <p>pero que soltar no pudiste.</p>
+        </section>
+        <section class="estrofa">
+            <p>Pues aunque amarte quiero,</p>
+            <p>mi <span class="highlight">ego roto</span> me dice que no puedo,</p>
+            <p>y mi <span class="highlight">orgullo grita</span> que no te escuche.</p>
+        </section>
+        <section class="estrofa">
+            <p>Pues aunque <span class="highlight">abrazarte me cortaría,</span></p>
+            <p>mi corazón apartarse de ti no quería.</p>
+            <p>Se aferra como <span class="highlight">pez en anzuelo</span></p>
+            <p>a nuestro <span class="highlight">último recuerdo.</span></p>
+            <p>Que aunque vagando se encuentre,</p>
+            <p>tú y yo sabemos</p>
+            <p>que <span class="highlight">amor aún nos queda…</span></p>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // === INICIO: GENERADOR DE CRISTALES 3D Y PARALLAX ===
+            const shardContainer = document.getElementById('shard-container');
+            const SHARD_COUNT = 25; // Número de cristales
+
+            for (let i = 0; i < SHARD_COUNT; i++) {
+                const shard = document.createElement('div');
+                const shapeClass = `shape${Math.ceil(Math.random() * 4)}`;
+                shard.className = `shard ${shapeClass}`;
+
+                const size = Math.random() * 150 + 50; // Tamaño entre 50 y 200px
+                const zPos = Math.random() * 800 - 400; // Posición Z entre -400px y 400px
+                
+                shard.style.width = `${size}px`;
+                shard.style.height = `${size}px`;
+                shard.style.top = `${Math.random() * 100}%`;
+                shard.style.left = `${Math.random() * 100}%`;
+
+                // Variables CSS para la animación de flotación
+                shard.style.setProperty('--x-start', `${Math.random() * 100 - 50}px`);
+                shard.style.setProperty('--y-start', `${Math.random() * 100 - 50}px`);
+                shard.style.setProperty('--x-end', `${Math.random() * 100 - 50}px`);
+                shard.style.setProperty('--y-end', `${Math.random() * 100 - 50}px`);
+                shard.style.setProperty('--z-start', `${zPos}px`);
+                
+                shard.style.animationDuration = `${Math.random() * 20 + 15}s`; // Duración de 15 a 35s
+
+                shardContainer.appendChild(shard);
+            }
+            
+            // Efecto Parallax al hacer scroll
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                // Mueve todo el contenedor de cristales en Z para el efecto de "caer"
+                shardContainer.style.transform = `translateZ(-${scrollY}px)`;
+            }, { passive: true });
+            // === FIN: GENERADOR DE CRISTALES 3D Y PARALLAX ===
+
+
+            const estrofas = document.querySelectorAll('.estrofa');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const estrofa = entry.target;
+                        estrofa.classList.add('visible');
+
+                        // Asigna retrasos escalonados a la animación de cada línea
+                        estrofa.querySelectorAll('p').forEach((p, index) => {
+                            p.style.animationDelay = `${index * 150}ms`;
+                        });
+                        
+                        observer.unobserve(estrofa);
+                    }
+                });
+            }, { threshold: 0.3 });
+
+            estrofas.forEach(estrofa => observer.observe(estrofa));
+
+            const homeButton = document.getElementById('home-button');
+            const pageHeader = document.querySelector('.page-header');
+
+            homeButton.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            const headerObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    homeButton.classList.toggle('visible', !entry.isIntersecting);
+                });
+            }, { threshold: 0.1 });
+            
+            if(pageHeader) headerObserver.observe(pageHeader);
+        });
+    </script>
+</body>
+</html>
