@@ -7,66 +7,102 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --color-background: #020205; /* Un negro casi absoluto */
-            --color-text: #d8dee9;
-            --color-glow-subtle: rgba(172, 193, 230, 0.1);
-            --color-glow-highlight: rgba(172, 193, 230, 0.7);
-            --font-serif: 'Playfair Display', serif; /* Cambiado a una fuente más dramática */
-            --font-alt-serif: 'Lora', serif;
+            /* Tema Oscuro (por defecto) */
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --heading-color: #ffffff;
+            --shard-border-color: rgba(255, 255, 255, 0.1);
+            --shard-gradient-start: rgba(255, 255, 255, 0.05);
+            --shard-gradient-end: rgba(255, 255, 255, 0);
+            --highlight-gradient: linear-gradient(90deg, #e1e1e1, #ffffff, #c1c1c1, #ffffff, #e1e1e1);
+            
+            --font-serif: 'Cormorant Garamond', serif;
+            --font-sans: 'Montserrat', sans-serif;
+            --transition-speed: 0.5s;
+
+            /* Variables para el reflejo del ratón, actualizadas por JS */
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+        }
+        
+        body.light-mode {
+             /* Tema Claro */
+            --bg-color: #e2e8f0;
+            --text-color: #2d3748;
+            --heading-color: #1a202c;
+            --shard-border-color: rgba(0, 0, 0, 0.1);
+            --shard-gradient-start: rgba(255, 255, 255, 0.5);
+            --shard-gradient-end: rgba(255, 255, 255, 0.1);
+            --highlight-gradient: linear-gradient(90deg, #4a5568, #2d3748, #718096, #2d3748, #4a5568);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
-            background-color: var(--color-background);
-            color: var(--color-text);
-            font-family: var(--font-alt-serif);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-sans);
             margin: 0;
             overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
         }
 
-        /* === INICIO: NUEVO FONDO DE CRISTALES 3D === */
+        /* --- CONTENEDOR DE FRAGMENTOS 3D --- */
         #shard-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            perspective: 500px; /* Activa el espacio 3D */
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            perspective: 800px;
             overflow: hidden;
         }
 
         .shard {
             position: absolute;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0));
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
+            /* El reflejo interactivo sigue al ratón usando variables CSS */
+            background-image: 
+                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.2) 0%, transparent 15%),
+                linear-gradient(135deg, var(--shard-gradient-start), var(--shard-gradient-end));
+            border: 1px solid var(--shard-border-color);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             transform-style: preserve-3d;
-            animation: float 20s infinite ease-in-out alternate;
+            animation: float 25s infinite ease-in-out alternate;
+            /* Optimización de rendimiento */
+            will-change: transform, opacity;
+            transition: transform 1.5s ease-out, opacity 1.5s ease-out, border-color var(--transition-speed), background-image var(--transition-speed);
         }
 
-        /* Diferentes formas de cristales usando clip-path */
-        .shard.shape1 { clip-path: polygon(0% 15%, 15% 0%, 100% 50%, 85% 100%, 20% 90%); }
-        .shard.shape2 { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
-        .shard.shape3 { clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
-        .shard.shape4 { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        .face-shard {
+            /* Los fragmentos de la cara tienen un brillo más sutil y un movimiento más lento */
+            animation-duration: 40s;
+            background-image: 
+                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.1) 0%, transparent 20%),
+                linear-gradient(135deg, var(--shard-gradient-start), var(--shard-gradient-end));
+        }
+
+        /* Formas de los fragmentos */
+        .shape1 { clip-path: polygon(0% 15%, 15% 0%, 100% 50%, 85% 100%, 20% 90%); }
+        .shape2 { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
+        .shape3 { clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
+        .shape4 { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
 
         @keyframes float {
             from { transform: translate3d(var(--x-start), var(--y-start), var(--z-start)) rotateX(0deg) rotateY(0deg); }
-            to { transform: translate3d(var(--x-end), var(--y-end), var(--z-start)) rotateX(360deg) rotateY(360deg); }
+            to { transform: translate3d(var(--x-end), var(--y-end), var(--z-start)) rotateX(180deg) rotateY(180deg); }
         }
-        /* === FIN: FONDO DE CRISTALES 3D === */
+
+        /* Animación final de "desmoronamiento" */
+        #shard-container.is-crumbling .shard {
+            transform: translateY(110vh) rotateZ(90deg) !important;
+            opacity: 0 !important;
+        }
         
         main, header {
-            position: relative; /* Para que esté por encima del fondo */
+            position: relative;
             z-index: 1;
         }
         
@@ -80,10 +116,10 @@
         }
 
         .page-header h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 700;
-            color: #fff;
-            text-shadow: 0 0 25px var(--color-glow-highlight);
+            color: var(--heading-color);
+            text-shadow: 0 0 15px var(--heading-color);
         }
 
         #poema-museo {
@@ -100,121 +136,73 @@
             justify-content: center;
             max-width: 700px;
             padding: 2rem;
-            margin-bottom: 10rem;
         }
 
-        /* === INICIO: NUEVA ANIMACIÓN DE TEXTO === */
         .estrofa p {
-            font-size: 2rem;
+            font-size: 1.8rem;
             line-height: 1.9;
             margin: 0.8rem 0;
             font-weight: 400;
             opacity: 0;
-            transform: translateY(15px);
-            animation: materialize 1s forwards cubic-bezier(0.165, 0.84, 0.44, 1);
-            animation-play-state: paused; /* La animación no corre hasta que se hace visible */
+            transform: translateY(20px);
+            transition: opacity 1.2s cubic-bezier(0.19, 1, 0.22, 1), transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
         }
         
         .estrofa.visible p {
-            animation-play-state: running;
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        @keyframes materialize {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-                clip-path: inset(50% 0 50% 0);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-                clip-path: inset(0% 0% 0% 0%);
-            }
-        }
-        /* === FIN: NUEVA ANIMACIÓN DE TEXTO === */
-
-        /* === INICIO: NUEVO RESALTADO "LUZ ATRAPADA" === */
         .highlight {
             font-family: var(--font-serif);
             font-weight: 700;
             font-style: italic;
-            
-            /* La magia: el texto es transparente, mostramos el fondo */
             color: transparent;
             -webkit-background-clip: text;
             background-clip: text;
-            
-            background-image: linear-gradient(90deg, #d8aeeB, #a2b2e8, #aed3e6, #a2b2e8, #d8aeeB);
-            background-size: 200% 100%;
-            animation: liquid-light 5s infinite linear;
+            background-image: var(--highlight-gradient);
+            background-size: 300% 100%;
+            animation: liquid-crystal 6s infinite linear;
+            transition: background-image var(--transition-speed);
         }
         
-        @keyframes liquid-light {
+        @keyframes liquid-crystal {
             from { background-position: 200% 0; }
             to { background-position: 0 0; }
         }
-        /* === FIN: NUEVO RESALTADO "LUZ ATRAPADA" === */
-
-        .ui-controls {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 100;
-        }
-
-        .control-button {
-            background: rgba(10, 10, 15, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            color: #fff;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            padding: 0;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-        }
         
-        .control-button.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
+        #theme-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 1000;
+            background: rgba(128, 128, 128, 0.1);
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            border-radius: 50%; width: 45px; height: 45px;
+            cursor: pointer; display: flex; justify-content: center; align-items: center;
+            backdrop-filter: blur(5px); transition: all 0.3s;
         }
-
-        .control-button:hover {
-            transform: scale(1.1);
-            border-color: #fff;
+        #theme-toggle:hover { transform: scale(1.1); }
+        #theme-toggle svg {
+            width: 24px; height: 24px; color: var(--heading-color);
+            position: absolute; transition: opacity 0.3s, transform 0.3s;
         }
-
-        .control-button svg {
-            width: 24px;
-            height: 24px;
-        }
+        #sun-icon { opacity: 0; }
+        body.light-mode #sun-icon { opacity: 1; }
+        body.light-mode #moon-icon { opacity: 0; }
 
         @media (max-width: 768px) {
-            .page-header h1 { font-size: 2.2rem; padding: 0 1rem; }
-            .estrofa { margin-bottom: 5rem; }
-            .estrofa p { font-size: 1.5rem; line-height: 1.8; }
-            .ui-controls { bottom: 1rem; right: 1rem; }
+            .page-header h1 { font-size: 2.5rem; }
+            .estrofa { min-height: auto; margin-bottom: 20vh; }
+            .estrofa p { font-size: 1.4rem; }
         }
     </style>
 </head>
 <body>
+    <button id="theme-toggle" title="Cambiar tema">
+        <svg id="moon-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A9.91 9.91 0 0 0 9 2.46A10 10 0 0 1 9 21.54A9.91 9.91 0 0 0 12 22A10 10 0 0 0 12 2Z"></path></svg>
+        <svg id="sun-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,12.5H23V11.5H20V12.5M1,12.5H4V11.5H1V12.5M12.5,20V23H11.5V20H12.5M12.5,1V4H11.5V1H12.5M18.36,19.78L20.5,21.92L19.78,22.63L17.65,20.5L18.36,19.78M4.22,6.34L6.35,4.22L5.64,3.5L3.5,5.64L4.22,6.34M19.78,5.64L17.65,3.5L18.36,4.22L20.5,6.34L19.78,5.64M3.5,18.36L5.64,17.65L6.34,19.78L4.22,20.5L3.5,18.36Z"></path></svg>
+    </button>
 
     <div id="shard-container">
         </div>
-
-    <div class="ui-controls">
-        <button id="home-button" class="control-button" title="Volver al inicio" aria-label="Volver al inicio">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8h5z"/></svg>
-        </button>
-    </div>
 
     <header class="page-header">
         <h1>El valle del olvido</h1>
@@ -257,6 +245,9 @@
             <p>Qué extraña es la luz -pensé-</p>
             <p>que <span class="highlight">ciega y arrastra.</span></p>
         </section>
+        
+        <div id="crumble-trigger"></div>
+        
         <section class="estrofa">
             <p>Ese <span class="highlight">rostro cortado, con pedazos de cristal, desmoronándose</span>,</p>
             <p>en el <span class="highlight">valle del olvido</span>,</p>
@@ -287,78 +278,116 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-
-            // === INICIO: GENERADOR DE CRISTALES 3D Y PARALLAX ===
+            const body = document.body;
             const shardContainer = document.getElementById('shard-container');
-            const SHARD_COUNT = 25; // Número de cristales
 
+            // --- LÓGICA DEL INTERRUPTOR DE TEMA ---
+            const themeToggle = document.getElementById('theme-toggle');
+            if (localStorage.getItem('theme') === 'light') {
+                body.classList.add('light-mode');
+            }
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('light-mode');
+                localStorage.setItem('theme', body.classList.contains('light-mode') ? 'light' : 'dark');
+            });
+            
+            // --- LÓGICA DEL REFLEJO INTERACTIVO ---
+            window.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const x = Math.round((clientX / window.innerWidth) * 100);
+                const y = Math.round((clientY / window.innerHeight) * 100);
+                shardContainer.style.setProperty('--mouse-x', `${x}%`);
+                shardContainer.style.setProperty('--mouse-y', `${y}%`);
+            }, { passive: true });
+            
+            // --- GENERADOR DE FRAGMENTOS DE CRISTAL ---
+            const SHARD_COUNT = 30; 
+            const FACE_SHARD_COUNT = 15;
+
+            // Coordenadas relativas (porcentaje) para una forma de cara abstracta
+            const faceMap = [
+                { x: 45, y: 35, z: -300 }, { x: 55, y: 35, z: -300 }, // Ojos
+                { x: 50, y: 45, z: -250 }, // Nariz
+                { x: 48, y: 60, z: -280 }, { x: 52, y: 60, z: -280 }, // Boca
+                { x: 35, y: 50, z: -100 }, { x: 65, y: 50, z: -100 }, // Mejillas
+                { x: 40, y: 25, z: 0 }, { x: 60, y: 25, z: 0 }, // Frente
+                { x: 50, y: 75, z: -50 } // Barbilla
+            ];
+
+            // Crear fragmentos que forman la cara
+            for (let i = 0; i < faceMap.length; i++) {
+                const point = faceMap[i];
+                const shard = document.createElement('div');
+                const shapeClass = `shape${(i % 4) + 1}`;
+                shard.className = `shard face-shard ${shapeClass}`;
+                
+                const size = Math.random() * 80 + 40;
+                const zPos = point.z + (Math.random() * 100 - 50);
+
+                shard.style.width = `${size}px`;
+                shard.style.height = `${size}px`;
+                shard.style.top = `${point.y + (Math.random() * 8 - 4)}%`;
+                shard.style.left = `${point.x + (Math.random() * 8 - 4)}%`;
+                
+                shard.style.setProperty('--x-start', `${Math.random()*20-10}px`);
+                shard.style.setProperty('--y-start', `${Math.random()*20-10}px`);
+                shard.style.setProperty('--x-end', `${Math.random()*20-10}px`);
+                shard.style.setProperty('--y-end', `${Math.random()*20-10}px`);
+                shard.style.setProperty('--z-start', `${zPos}px`);
+                shard.style.animationDelay = `${Math.random() * 5}s`;
+                shardContainer.appendChild(shard);
+            }
+
+            // Crear fragmentos aleatorios adicionales para llenar el espacio
             for (let i = 0; i < SHARD_COUNT; i++) {
                 const shard = document.createElement('div');
                 const shapeClass = `shape${Math.ceil(Math.random() * 4)}`;
                 shard.className = `shard ${shapeClass}`;
 
-                const size = Math.random() * 150 + 50; // Tamaño entre 50 y 200px
-                const zPos = Math.random() * 800 - 400; // Posición Z entre -400px y 400px
+                const size = Math.random() * 120 + 30; 
+                const zPos = Math.random() * 1000 - 500;
                 
                 shard.style.width = `${size}px`;
                 shard.style.height = `${size}px`;
                 shard.style.top = `${Math.random() * 100}%`;
                 shard.style.left = `${Math.random() * 100}%`;
 
-                // Variables CSS para la animación de flotación
-                shard.style.setProperty('--x-start', `${Math.random() * 100 - 50}px`);
-                shard.style.setProperty('--y-start', `${Math.random() * 100 - 50}px`);
-                shard.style.setProperty('--x-end', `${Math.random() * 100 - 50}px`);
-                shard.style.setProperty('--y-end', `${Math.random() * 100 - 50}px`);
+                shard.style.setProperty('--x-start', `${Math.random()*100-50}px`);
+                shard.style.setProperty('--y-start', `${Math.random()*100-50}px`);
+                shard.style.setProperty('--x-end', `${Math.random()*100-50}px`);
+                shard.style.setProperty('--y-end', `${Math.random()*100-50}px`);
                 shard.style.setProperty('--z-start', `${zPos}px`);
-                
-                shard.style.animationDuration = `${Math.random() * 20 + 15}s`; // Duración de 15 a 35s
-
+                shard.style.animationDuration = `${Math.random() * 20 + 20}s`;
                 shardContainer.appendChild(shard);
             }
-            
-            // Efecto Parallax al hacer scroll
-            window.addEventListener('scroll', () => {
-                const scrollY = window.scrollY;
-                // Mueve todo el contenedor de cristales en Z para el efecto de "caer"
-                shardContainer.style.transform = `translateZ(-${scrollY}px)`;
-            }, { passive: true });
-            // === FIN: GENERADOR DE CRISTALES 3D Y PARALLAX ===
 
-
-            const estrofas = document.querySelectorAll('.estrofa');
-            const observer = new IntersectionObserver((entries) => {
+            // --- OBSERVADOR PARA LA APARICIÓN DEL TEXTO Y ANIMACIÓN FINAL ---
+            const estrofaObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const estrofa = entry.target;
-                        estrofa.classList.add('visible');
-
-                        // Asigna retrasos escalonados a la animación de cada línea
-                        estrofa.querySelectorAll('p').forEach((p, index) => {
-                            p.style.animationDelay = `${index * 150}ms`;
+                        entry.target.classList.add('visible');
+                        const lines = entry.target.querySelectorAll('p');
+                        lines.forEach((line, index) => {
+                            line.style.transitionDelay = `${index * 150}ms`;
                         });
-                        
-                        observer.unobserve(estrofa);
+                        estrofaObserver.unobserve(entry.target);
                     }
                 });
             }, { threshold: 0.3 });
 
-            estrofas.forEach(estrofa => observer.observe(estrofa));
+            document.querySelectorAll('.estrofa').forEach(estrofa => estrofaObserver.observe(estrofa));
 
-            const homeButton = document.getElementById('home-button');
-            const pageHeader = document.querySelector('.page-header');
+            const crumbleTrigger = document.getElementById('crumble-trigger');
+            const finalObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    shardContainer.classList.add('is-crumbling');
+                    finalObserver.unobserve(entries[0].target);
+                }
+            }, { threshold: 0.8 });
 
-            homeButton.addEventListener('click', () => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-
-            const headerObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    homeButton.classList.toggle('visible', !entry.isIntersecting);
-                });
-            }, { threshold: 0.1 });
-            
-            if(pageHeader) headerObserver.observe(pageHeader);
+            if (crumbleTrigger) {
+                finalObserver.observe(crumbleTrigger);
+            }
         });
     </script>
 </body>
