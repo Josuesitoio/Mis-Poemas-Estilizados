@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Pintor de Sueños</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Tema Claro (por defecto) */
+            --bg-canvas: #f4f1ea;
+            --text-color: #4a423b;
+            --heading-color: #2c2825;
+            --highlight-font: #000000;
+            --paint-blob-1: rgba(236, 179, 144, 0.3); /* melocotón suave */
+            --paint-blob-2: rgba(168, 194, 213, 0.3); /* azul sereno */
+            --paint-blob-3: rgba(221, 201, 134, 0.3); /* dorado pálido */
+            --brushstroke-color: rgba(0, 0, 0, 0.05);
+
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Raleway', sans-serif;
+            --transition-speed: 0.5s;
+        }
+
+        body.dark-mode {
+            /* Tema Oscuro */
+            --bg-canvas: #242429;
+            --text-color: #b0aeb4;
+            --heading-color: #ffffff;
+            --highlight-font: #ffffff;
+            --paint-blob-1: rgba(199, 119, 149, 0.3); /* magenta profundo */
+            --paint-blob-2: rgba(92, 128, 188, 0.3);  /* azul noche */
+            --paint-blob-3: rgba(212, 175, 55, 0.3);  /* dorado brillante */
+            --brushstroke-color: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-color);
+            font-family: var(--font-sans);
+            margin: 0;
+            overflow-x: hidden;
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* --- Textura del Lienzo --- */
+        #canvas-texture {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -2;
+            opacity: 0.5;
+            filter: url(#noise);
+        }
+
+        /* --- Manchas de Pintura de Fondo --- */
+        .paint-blob-container {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .paint-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 1;
+            transition: background-color 2s, opacity 2s;
+        }
+        #blob1 { width: 40vw; height: 40vw; top: 10%; left: 5%; background-color: var(--paint-blob-1); animation: drift 30s infinite alternate ease-in-out; }
+        #blob2 { width: 30vw; height: 30vw; bottom: 5%; right: 10%; background-color: var(--paint-blob-2); animation: drift 35s infinite alternate-reverse ease-in-out; }
+        #blob3 { width: 50vw; height: 50vw; top: 40%; left: 30%; background-color: var(--paint-blob-3); animation: drift 40s infinite alternate ease-in-out; }
+
+        @keyframes drift {
+            from { transform: translate(-5vw, -10vh) rotate(-10deg); }
+            to { transform: translate(10vw, 5vh) rotate(10deg); }
+        }
+
+        /* Clase para cuando el color se desvanece al final */
+        body.color-drained .paint-blob {
+            background-color: rgba(128, 128, 128, 0.1) !important;
+        }
+
+        main {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content-wrapper {
+            max-width: 700px;
+            padding: 5rem 2rem;
+            position: relative;
+        }
+
+        header {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--heading-color);
+            transition: color var(--transition-speed);
+        }
+
+        .estrofa {
+            margin-bottom: 25vh;
+            opacity: 0;
+            filter: blur(5px);
+            transform: translateY(20px);
+            transition: opacity 1.2s, filter 1.2s, transform 1.2s;
+            transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .estrofa.visible {
+            opacity: 1;
+            filter: blur(0);
+            transform: translateY(0);
+        }
+
+        .estrofa p {
+            font-size: 1.6rem;
+            line-height: 2;
+            margin: 0.5rem 0;
+        }
+
+        .highlight {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-weight: 700;
+            color: var(--highlight-font);
+            position: relative;
+        }
+        
+        /* Pincelada bajo el texto */
+        .brushstroke-underline::after {
+            content: '';
+            position: absolute;
+            left: -10%;
+            bottom: -5px;
+            width: 120%;
+            height: 8px;
+            background-color: var(--brushstroke-color);
+            border-radius: 50%;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+            transition-delay: 0.5s;
+        }
+        .estrofa.visible .brushstroke-underline::after {
+            transform: scaleX(1);
+        }
+
+        /* El trazo final de la firma del pintor */
+        #signature {
+            font-family: var(--font-highlight), cursive;
+            font-size: 2rem;
+            display: block;
+            text-align: right;
+            margin-top: 5rem;
+        }
+
+        #theme-toggle {
+            position: fixed; top: 20px; right: 20px; z-index: 1000; font-size: 1.5rem;
+            background: transparent; border: none; cursor: pointer; transition: transform 0.3s;
+        }
+        #theme-toggle:hover { transform: scale(1.2); }
+        #sun-icon { display: none; }
+        body.dark-mode #sun-icon { display: block; }
+        body.dark-mode #moon-icon { display: none; }
+
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.5rem; }
+            .estrofa p { font-size: 1.3rem; }
+            .estrofa { margin-bottom: 20vh; }
+        }
+    </style>
+</head>
+<body>
+    <svg style="position:absolute; width:0; height:0;">
+        <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="4" stitchTiles="stitch"/>
+            <feColorMatrix type="saturate" values="0"/>
+        </filter>
+    </svg>
+    <div id="canvas-texture"></div>
+
+    <button id="theme-toggle" title="Cambiar tema">
+        <span id="moon-icon">🎨</span>
+        <span id="sun-icon">🖌️</span>
+    </button>
+    
+    <div class="paint-blob-container">
+        <div class="paint-blob" id="blob1"></div>
+        <div class="paint-blob" id="blob2"></div>
+        <div class="paint-blob" id="blob3"></div>
+    </div>
+
+    <main>
+        <div class="content-wrapper">
+            <header>
+                <h1>El Pintor de Sueños</h1>
+            </header>
+
+            <section class="estrofa">
+                <p>Hoy luces hermosa,</p>
+                <p>dije, te dije;</p>
+                <p>pareciese que alguien</p>
+                <p>te hubiera escrito,</p>
+                <p>pues de lo <span class="highlight">onírico</span> pareces</p>
+                <p>haber salido.</p>
+            </section>
+            
+            <section class="estrofa">
+                <p>Pude tocarte, acariciarte,</p>
+                <p>rozar tu piel cual <span class="highlight brushstroke-underline">pinceladas</span></p>
+                <p>de un pintor enamorado</p>
+                <p>de su obra.</p>
+            </section>
+
+            <section class="estrofa">
+                <p>Pude besarte y sentir</p>
+                <p>cómo nuestros cuerpos <span class="highlight brushstroke-underline">danzaban,</span></p>
+                <p>con pasión, al simple tacto</p>
+                <p>de ese gran pintor.</p>
+            </section>
+            
+            <section class="estrofa">
+                <p>Hoy nos vimos y al fin</p>
+                <p>los dos coincidimos:</p>
+                <p>que amor era lo que sentíamos.</p>
+                <p>Ambos lo dijimos, ambos lo entendimos,</p>
+                <p>ambos coincidíamos en que</p>
+                <p><span class="highlight">amar era amarte, y amarte era estar.</span></p>
+            </section>
+
+            <section class="estrofa">
+                <p>Pero el alma, más sabia,</p>
+                <p>logró ver aquello que yo no.</p>
+            </section>
+
+            <section class="estrofa">
+                <p>Y recordé que</p>
+                <p>mi perdón no merecías, y tú bien sabías</p>
+                <p>que el cambio yo no quería.</p>
+                <p>Tus intenciones hablaban</p>
+                <p>como el pintor que no explica:</p>
+                <p>su <span class="highlight">arte no necesita palabras.</span></p>
+            </section>
+            
+            <section class="estrofa">
+                 <p>Yo quería que el dolor, al vernos, riera</p>
+                <p>y que, al verte, el amor bailara.</p>
+            </section>
+
+            <section class="estrofa">
+                <p>Pero quién diría que solo en lo <span class="highlight">irreal,</span></p>
+                <p>en los <span class="highlight">sueños,</span> sería el único lugar</p>
+                <p>donde me amarías como te amé,</p>
+                <p>donde me cantaras como te canté,</p>
+                <p>donde me escribieras como te escribí.</p>
+            </section>
+            
+            <div id="revelation-trigger"></div>
+
+            <section class="estrofa">
+                <p>Pues en mi afán de ser tu musa</p>
+                <p>descubrí mi verdadero papel:</p>
+                <p><span class="highlight" id="signature">el pintor era yo.</span></p>
+            </section>
+
+            <section class="estrofa">
+                <p>Y aunque siempre amé esa obra</p>
+                <p>que nunca me amaba,</p>
+                <p>aunque pinceladas suaves di</p>
+                <p>a un lienzo que no respondía,</p>
+                <p>mi amor se perdió.</p>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const body = document.body;
+            const themeToggle = document.getElementById('theme-toggle');
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+            }
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+            });
+
+            const estrofas = document.querySelectorAll('.estrofa');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        const estrofa = entry.target;
+                        estrofa.style.transitionDelay = `${index * 100}ms`;
+                        estrofa.classList.add('visible');
+                        observer.unobserve(estrofa);
+                    }
+                });
+            }, { threshold: 0.2 });
+            estrofas.forEach(estrofa => observer.observe(estrofa));
+            const revelationTrigger = document.getElementById('revelation-trigger');
+            const revelationObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        body.classList.add('color-drained');
+                        revelationObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 1.0 });
+            if (revelationTrigger) {
+                revelationObserver.observe(revelationTrigger);
+            }
+        });
+    </script>
+</body>
+</html>
