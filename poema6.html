@@ -1,434 +1,457 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cuan conciente es un hilo</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Spline+Sans+Mono:wght@300;400&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>¿Cuán consciente es un hilo?</title>
 
-    <style>
-        /*
-        ============================================
-        --- CONFIGURACIÓN DE TEMA Y VARIABLES ---
-        ============================================
-        * Se definen los colores para ambos modos (claro y oscuro).
-        * El color del hilo se mantiene rojo y brillante en ambos.
-        */
-        :root {
-            /* Tema Oscuro (por defecto) */
-            --bg-color: #1a1818;
-            --text-color: #9e9e9e;
-            --heading-color: #ffffff;
-            --thread-color: #ff3b30;
-            --thread-glow: rgba(255, 59, 48, 0.5);
-            
-            --font-sans: 'Spline Sans Mono', monospace;
-            --font-serif: 'Playfair Display', serif;
-            --transition-speed: 0.5s;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spline+Sans+Mono:wght@300;400&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 
-        body.light-mode {
-            /* Tema Claro */
-            --bg-color: #f5f2ed;
-            --text-color: #4a4a4a;
-            --heading-color: #000000;
-        }
+<style>
+:root{
+  --bg-color: #0f0f10;
+  --bg-grad: linear-gradient(180deg,#0f0f10 0%, #141416 60%);
+  --text-color: #cfcfcf;
+  --muted: #9a9a9a;
+  --heading: #ffffff;
+  --thread-color: #ff3b30;
+  --thread-glow: rgba(255,59,48,.32);
+  --glass: rgba(255,255,255,.04);
 
-        /*
-        ============================================
-        --- ESTILOS GENERALES Y DEL CUERPO ---
-        ============================================
-        * El fondo es un canvas limpio para que los hilos destaquen.
-        * Se oculta el desbordamiento para controlar el layout.
-        */
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-sans);
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            transition: background-color var(--transition-speed), color var(--transition-speed);
-        }
+  --font-sans: 'Spline Sans Mono', monospace;
+  --font-serif: 'Playfair Display', serif;
+  --transition: 420ms;
+}
 
-        /*
-        ============================================
-        --- ESTRUCTURA PRINCIPAL Y LIENZO ---
-        ============================================
-        * El 'canvas' es el contenedor principal que permite el posicionamiento
-          absoluto de los hilos y el texto, creando un diorama.
-        * La altura se calcula en JS para abarcar todo el contenido.
-        */
-        .canvas {
-            position: relative;
-            width: 100%;
-            margin: 0 auto;
-        }
+body.light-mode{
+  --bg-color: #f6f3ef;
+  --bg-grad: linear-gradient(180deg,#f6f3ef 0%, #eee9e2 60%);
+  --text-color: #222;
+  --muted: #5a5a5a;
+  --heading: #0a0a0a;
+  --thread-glow: rgba(255,59,48,.22);
+  --glass: rgba(0,0,0,.03);
+}
 
-        /*
-        ============================================
-        --- ESTILOS DE LOS HILOS (SVG) ---
-        ============================================
-        * Los hilos están presentes desde el inicio.
-        * Tienen una animación sutil para que se sientan "vivos".
-        * El filtro drop-shadow crea el efecto de brillo.
-        */
-        .thread {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        
-        .thread path {
-            stroke: var(--thread-color);
-            fill: none;
-            filter: drop-shadow(0 0 5px var(--thread-glow));
-            transition: stroke var(--transition-speed), filter var(--transition-speed);
-            animation: breathe 8s ease-in-out infinite;
-        }
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:var(--bg-grad);
+  color:var(--text-color);
+  font-family:var(--font-sans);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden;
+  transition: background var(--transition), color var(--transition);
+}
 
-        @keyframes breathe {
-            0%, 100% { stroke-width: 2.5; }
-            50% { stroke-width: 3.5; }
-        }
+/* theme toggle */
+#theme-toggle{
+  position:fixed; top:18px; right:18px;
+  z-index:1200; width:44px; height:44px;
+  display:inline-grid; place-items:center;
+  border-radius:10px; border:none;
+  background:var(--glass); color:var(--text-color);
+  cursor:pointer; backdrop-filter: blur(6px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+  transition: transform .15s, background var(--transition);
+}
+#theme-toggle:active{ transform: scale(.98); }
+#sun-icon{display:none}
+body.light-mode #sun-icon{display:inline}
+body.light-mode #moon-icon{display:none}
 
-        /* Capas de hilos para crear profundidad y el efecto de tejido */
-        #background-thread { z-index: 1; opacity: 0.4; }
-        #midground-thread { z-index: 3; }
-        #foreground-thread { z-index: 5; } /* La capa más alta para pasar sobre el texto */
+/* canvas / threads */
+.canvas{
+  position:relative;
+  width:100%;
+  margin:0 auto;
+  overflow:visible;
+  min-height:100vh;
+}
 
-        /*
-        ============================================
-        --- ESTILOS DEL TEXTO Y ESTROFAS ---
-        ============================================
-        * Las estrofas se posicionan de forma absoluta en el lienzo.
-        * Cada palabra está en un 'span' para animaciones escalonadas.
-        * El z-index del texto es 4, permitiendo que los hilos
-          pasen por encima (z-index: 5) y por debajo (z-index: 1, 3).
-        */
-        .estrofa {
-            position: absolute;
-            width: 400px; /* Ancho base para el texto */
-            z-index: 4;
-        }
+/* thread svgs - absolute but height set to document height in JS */
+.thread{
+  position:absolute; left:0; top:0;
+  width:100%;
+  pointer-events:none;
+  transform-origin:50% 0;
+  will-change: transform;
+}
+.thread path{
+  stroke-linecap:round; stroke-linejoin:round;
+  stroke: url(#threadGrad);
+  fill:none;
+  filter: drop-shadow(0 0 10px var(--thread-glow));
+  transition: stroke-width var(--transition), filter var(--transition);
+}
+.thread .flow{
+  stroke-dasharray: 12 8 6 8;
+  animation: flowAnim 6s linear infinite;
+  opacity: .98;
+}
+@keyframes flowAnim{ to { stroke-dashoffset: -140 } }
 
-        .estrofa p {
-            font-size: 1.3rem;
-            line-height: 1.9;
-            margin: 0;
-            /* Se necesita para que los spans internos no se desborden durante la animación */
-            display: block;
-            -webkit-font-smoothing: antialiased;
-        }
-        
-        .estrofa p .word {
-            display: inline-block;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.8s, transform 0.8s;
-            transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);
-        }
+#background-thread{ z-index:1; opacity:.45; }
+#midground-thread{ z-index:4; opacity:.95; }
+#foreground-thread{ z-index:12; opacity:1; }
 
-        .estrofa.visible p .word {
-            opacity: 1;
-            transform: translateY(0);
-        }
+/* content (estrofas) in normal flow now */
+.poem-content{
+  width:100%;
+  max-width:1150px;
+  margin: 40px auto 120px;
+  padding: 24px;
+  position:relative;
+  z-index:6; /* above background thread */
+}
 
-        .highlight {
-            font-family: var(--font-serif);
-            font-style: italic;
-            color: var(--heading-color);
-        }
+/* .estrofa no longer absolute: flow layout with spacing */
+.estrofa{
+  position:relative;
+  width:48%;
+  margin: 3.5vh 0;
+  padding: 12px 16px;
+  transition: opacity var(--transition) ease, transform var(--transition) ease;
+  opacity:0;
+  transform: translateY(12px);
+  will-change: opacity, transform;
+  background: transparent;
+}
 
-        .thread-voice {
-            font-family: var(--font-serif);
-            font-weight: 700;
-            color: var(--thread-color);
-            text-shadow: 0 0 8px var(--thread-glow);
-        }
+/* alignment helpers */
+.estrofa.align-right{ margin-left:auto; text-align:right; }
+.estrofa.align-left{ margin-right:auto; text-align:left; }
 
-        /* Posicionamiento específico de cada estrofa en el lienzo */
-        #estrofa-1 { top: 15vh; left: 15vw; }
-        #estrofa-2 { top: 60vh; left: 55vw; text-align: right; }
-        #estrofa-3 { top: 110vh; left: 10vw; }
-        #estrofa-4 { top: 160vh; left: 50vw; text-align: right; }
-        #estrofa-5 { top: 210vh; left: 18vw; }
-        #estrofa-6 { top: 250vh; left: 45vw; text-align: right; }
+/* visible state (fade in) */
+.estrofa.visible{ opacity:1; transform: translateY(0); }
 
-        /*
-        ============================================
-        --- ANIMACIONES ESPECIALES ---
-        ============================================
-        */
-        @keyframes tug-animation {
-            0%, 100% { transform: translate(0, 0); }
-            10%, 50%, 90% { transform: translate(-3px, 1px) rotate(-0.5deg); }
-            30%, 70% { transform: translate(3px, -1px) rotate(0.5deg); }
-        }
-        .is-tugging {
-            animation: tug-animation 0.6s cubic-bezier(.36,.07,.19,.97) both;
-        }
-        
-        #pendulum-container {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            z-index: 3;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-        #pendulum-container.visible { opacity: 1; }
-        #pendulum-thread {
-            stroke: var(--thread-color);
-            stroke-width: 2.5;
-            fill: none;
-            filter: drop-shadow(0 0 5px var(--thread-glow));
-            transform-origin: 50% 0;
-            animation: swing 3.5s infinite ease-in-out;
-        }
-        @keyframes swing {
-            0%, 100% { transform: rotate(25deg); }
-            50% { transform: rotate(-25deg); }
-        }
-        
-        /*
-        ============================================
-        --- PARTÍCULAS ---
-        ============================================
-        */
-        #particles-container {
-            position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 6; pointer-events: none;
-        }
-        .particle {
-            position: absolute;
-            width: 3px; height: 3px;
-            background-color: var(--thread-color);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--thread-glow);
-            animation: float-away 3s ease-out forwards;
-        }
-        @keyframes float-away {
-            from { transform: scale(1); opacity: 0.8; }
-            to { transform: translate(var(--x-end), var(--y-end)) scale(0); opacity: 0; }
-        }
+/* text */
+.estrofa p{
+  margin:0;
+  font-size:1.12rem;
+  line-height:1.78;
+  letter-spacing:.2px;
+  hyphens:auto;
+}
 
-        /*
-        ============================================
-        --- INTERRUPTOR DE TEMA Y RESPONSIVIDAD ---
-        ============================================
-        */
-        #theme-toggle {
-            position: fixed; top: 20px; right: 20px; z-index: 1000; font-size: 1.5rem;
-            background: transparent; border: none; cursor: pointer; transition: transform 0.3s;
-        }
-        #theme-toggle:hover { transform: scale(1.2); }
-        #sun-icon { display: none; }
-        body.dark-mode #sun-icon { display: block; }
-        body.dark-mode #moon-icon { display: none; }
+/* words stagger */
+.word{ display:inline-block; opacity:0; transform:translateY(8px); transition: transform .6s cubic-bezier(.19,1,.22,1), opacity .6s; }
+.estrofa.visible .word{ opacity:1; transform:translateY(0); }
 
-        @media (max-width: 768px) {
-            .estrofa {
-                width: 80vw;
-                left: 10vw !important; /* Forzar alineación a la izquierda */
-                text-align: left !important;
-                margin-bottom: 20vh;
-            }
-            .estrofa p { font-size: 1.1rem; }
-            
-            #estrofa-1 { top: 10vh; }
-            #estrofa-2 { top: 50vh; }
-            #estrofa-3 { top: 85vh; }
-            #estrofa-4 { top: 125vh; }
-            #estrofa-5 { top: 160vh; }
-            #estrofa-6 { top: 190vh; }
-        }
-    </style>
+/* highlight and thread voice */
+.highlight{ font-family:var(--font-serif); font-style:italic; color:var(--heading); font-weight:600; text-decoration:underline wavy rgba(255,255,255,.03); }
+.thread-voice{ font-family:var(--font-serif); font-weight:700; color:var(--thread-color); text-shadow: 0 0 8px var(--thread-glow); }
+
+/* title */
+.titulo-poema{ font-size:2rem; font-family:var(--font-serif); margin-bottom:.45rem; color:var(--heading); letter-spacing:.6px; }
+
+/* dialog */
+.dialogo{ margin-left:.8rem; font-style:italic; color:var(--muted); }
+
+/* pendulum */
+#pendulum-container{ position:fixed; width:100px; height:100px; z-index:14; opacity:0; pointer-events:none; transform: translateY(0); transition: opacity .32s ease, transform .32s ease; }
+#pendulum-container.visible{ opacity:1; }
+
+/* tug */
+.is-tugging{ animation: tug 620ms cubic-bezier(.36,.07,.19,.97) both; }
+@keyframes tug{
+  0%,100%{ transform: translateX(0) }
+  20%{ transform: translateX(-6px) rotate(-1deg) }
+  60%{ transform: translateX(6px) rotate(1deg) }
+}
+
+/* particle */
+.particle{ position:absolute; width:4px; height:4px; border-radius:50%; background:var(--thread-color); box-shadow: 0 0 10px var(--thread-glow); pointer-events:none; }
+
+/* responsive */
+@media (max-width:1100px){
+  .estrofa{ width:60%; }
+}
+@media (max-width:800px){
+  .poem-content{ padding:12px }
+  .estrofa{ width:100%; margin: 3vh 0; text-align:left; }
+  .estrofa.align-right{ text-align:left; margin-left:0; }
+  .titulo-poema{ font-size:1.6rem }
+  .estrofa p{ font-size:1.02rem }
+}
+</style>
 </head>
 <body>
 
-    <button id="theme-toggle" title="Cambiar tema">
-        <span id="moon-icon">🌙</span>
-        <span id="sun-icon">☀️</span>
-    </button>
-    
-    <div class="canvas" id="main-canvas">
-        <div id="particles-container"></div>
-    
-        <svg id="background-thread" class="thread" viewBox="0 0 1400 3000" preserveAspectRatio="xMidYMin slice">
-            <path d="M 100,0 C 400,200 800,100 1300,400 S 1000,800 600,900 S 100,1200 500,1400 S 1200,1600 1300,1800 S 800,2200 400,2400 S 200,2800 700,3000" />
-        </svg>
+<button id="theme-toggle" aria-label="Cambiar tema">
+  <span id="moon-icon">🌙</span>
+  <span id="sun-icon">☀️</span>
+</button>
 
-        <svg id="midground-thread" class="thread" viewBox="0 0 1400 3000" preserveAspectRatio="xMidYMin slice">
-            <path id="main-thread-path" d="M 300,0 C 0,300 500,400 700,600 S 900,800 1300,900 S 1000,1300 700,1500 S 400,1700 200,1900 S 600,2300 900,2500 S 1300,2800 1100,3000" />
-        </svg>
+<div class="canvas" id="main-canvas" role="main" aria-label="Poema y hilos">
+  <div id="particles-container" aria-hidden="true"></div>
 
-        <svg id="foreground-thread" class="thread" viewBox="0 0 1400 3000" preserveAspectRatio="xMidYMin slice">
-            <path d="M 250,150 C 350,180 450,180 550,150" />
-            <path d="M 950,490 C 1050,520 1150,520 1250,490" />
-            <path d="M 150,1150 C 250,1180 350,1180 450,1150" />
-            <path d="M 1100,1700 C 1000,1670 900,1670 800,1700" />
-            <path d="M 850,2650 C 950,2680 1050,2680 1150,2650" />
-        </svg>
-        
-        <div id="pendulum-container">
-            <svg width="100" height="100"><path id="pendulum-thread" d="M 50,0 V 80" /></svg>
-        </div>
+  <!-- SVG gradient defs -->
+  <svg width="0" height="0" style="position:absolute">
+    <defs>
+      <linearGradient id="threadGrad" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0%" stop-color="#ff7a74" stop-opacity="1"/>
+        <stop offset="50%" stop-color="#ff3b30" stop-opacity="1"/>
+        <stop offset="100%" stop-color="#d82b2b" stop-opacity="1"/>
+      </linearGradient>
+    </defs>
+  </svg>
 
-        <div id="estrofa-1" class="estrofa">
-            <p>No te extraño</p>
-            <p>Dije, me dije</p>
-            <p>Incrédulo,</p>
-            <p>Y con la dirección de un <span class="highlight" id="pendulum-trigger">péndulo.</span></p>
-        </div>
-        
-        <div id="estrofa-2" class="estrofa">
-            <p id="tug-trigger">Hoy tiraste, jalaste</p>
-            <p>De aquel hilo que nos atamos</p>
-            <p>Sentí, sentiste, sentimos...</p>
-        </div>
+  <!-- threads -->
+  <svg id="background-thread" class="thread" data-depth="0.06" viewBox="0 0 1400 3000" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+    <path class="flow" stroke-width="1.8" d="M 100,0 C 400,200 800,100 1300,400 S 1000,800 600,900 S 100,1200 500,1400 S 1200,1600 1300,1800 S 800,2200 400,2400 S 200,2800 700,3000"/>
+  </svg>
 
-        <div id="estrofa-3" class="estrofa">
-            <p>Tiraste de mis ideas</p>
-            <p>Tiraste de mis pensamientos</p>
-            <p>Y yo cuál <span class="highlight">alma errante</span></p>
-            <p>Que busca una caricia</p>
-            <p>Te creí</p>
-        </div>
+  <svg id="midground-thread" class="thread" data-depth="0.14" viewBox="0 0 1400 3000" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+    <path id="main-thread-path" class="flow" stroke-width="2.2" d="M 300,0 C 0,300 500,400 700,600 S 900,800 1300,900 S 1000,1300 700,1500 S 400,1700 200,1900 S 600,2300 900,2500 S 1300,2800 1100,3000"/>
+  </svg>
 
-        <div id="estrofa-4" class="estrofa">
-            <p>Aún con dolor te ame,</p>
-            <p><span class="thread-voice">No como me amaste</span></p>
-            <p><span class="thread-voice">Yo no amo tan poco</span></p>
-            <p><span class="thread-voice">Dijo el hilo rojo.</span></p>
-        </div>
-        
-        <div id="estrofa-5" class="estrofa">
-            <p>Me asusté...</p>
-            <p>Pero curioso pregunté</p>
-            <p>¿A qué te refieres?</p>
-        </div>
+  <svg id="foreground-thread" class="thread" data-depth="0.26" viewBox="0 0 1400 3000" preserveAspectRatio="xMidYMin slice" aria-hidden="true">
+    <path class="flow" stroke-width="2.6" d="M 250,150 C 350,180 450,180 550,150" />
+    <path class="flow" stroke-width="2.6" d="M 950,490 C 1050,520 1150,520 1250,490" />
+    <path class="flow" stroke-width="2.6" d="M 150,1150 C 250,1180 350,1180 450,1150" />
+    <path class="flow" stroke-width="2.6" d="M 1100,1700 C 1000,1670 900,1670 800,1700" />
+    <path class="flow" stroke-width="2.6" d="M 850,2650 C 950,2680 1050,2680 1150,2650" />
+  </svg>
 
-        <div id="estrofa-6" class="estrofa">
-            <p><span class="thread-voice">El contesto, ella jamás ato aquel nudo</span></p>
-            <p><span class="thread-voice">Siempre fuiste tu...</span></p>
-        </div>
+  <!-- pendulum -->
+  <div id="pendulum-container" aria-hidden="true">
+    <svg width="100" height="100" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
+      <g>
+        <line id="pendulum-thread" x1="50" y1="0" x2="50" y2="80" stroke="url(#threadGrad)" stroke-width="2.4" stroke-linecap="round" />
+        <circle cx="50" cy="82" r="7" fill="url(#threadGrad)" />
+      </g>
+    </svg>
+  </div>
 
+  <!-- POEM CONTENT (in flow; estrofas aligned left/right) -->
+  <div class="poem-content" id="poem-content">
+    <div id="estrofa-1" class="estrofa align-left">
+      <p class="titulo-poema">No te extraño</p>
+      <p>Dije, me dije,</p>
+      <p>Incrédulo,</p>
+      <p>Con la oscilación incierta de un <span class="highlight" id="pendulum-trigger">péndulo</span></p>
+      <p>que no sabe a qué lado rendirse.</p>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const body = document.body;
-            const mainCanvas = document.getElementById('main-canvas');
+    <div id="estrofa-2" class="estrofa align-right">
+      <p id="tug-trigger">Hoy jalaste, tiraste,</p>
+      <p>Tensaste aquel <span class="highlight">hilo</span> que alguna vez</p>
+      <p>juramos indestructible.</p>
+      <p>Sentí, sentiste, sentimos… <span class="highlight">al menos eso quise creer.</span></p>
+    </div>
 
-            // --- AJUSTAR ALTURA DEL LIENZO AL CONTENIDO ---
-            // Se usa un pequeño retraso para asegurar que todas las fuentes y elementos se hayan renderizado
-            setTimeout(() => {
-                const contentHeight = mainCanvas.scrollHeight;
-                mainCanvas.style.height = `${contentHeight}px`;
-                document.querySelectorAll('.thread').forEach(svg => {
-                    svg.setAttribute('height', contentHeight);
-                });
-            }, 100);
+    <div id="estrofa-3" class="estrofa align-left">
+      <p>Tiraste de mis ideas,</p>
+      <p>arrastraste mis pensamientos,</p>
+      <p>y yo, como un <span class="highlight">alma errante</span></p>
+      <p>que suplica un roce,</p>
+      <p><span class="highlight">te creí.</span></p>
+    </div>
 
+    <div id="estrofa-4" class="estrofa align-right">
+      <p>Aún con dolor te amé,</p>
+      <p><span class="thread-voice">aunque no como tú me amaste;</span></p>
+      <p><span class="thread-voice">yo no sé amar tan poco,</span></p>
+      <p><span class="thread-voice">susurró el hilo rojo,</span></p>
+      <p>con una voz <span class="highlight">grave, antigua,</span></p>
+      <p>como quien ha visto demasiadas promesas</p>
+      <p><span class="highlight">deshacerse en silencio.</span></p>
+    </div>
 
-            // --- LÓGICA DEL INTERRUPTOR DE TEMA ---
-            const themeToggle = document.getElementById('theme-toggle');
-            if (localStorage.getItem('theme') === 'light') { body.classList.add('light-mode'); }
-            themeToggle.addEventListener('click', () => {
-                body.classList.toggle('light-mode');
-                localStorage.setItem('theme', body.classList.contains('light-mode') ? 'light' : 'dark');
-            });
-            
-            // --- FUNCIÓN CORREGIDA PARA ENVOLVER PALABRAS EN SPANS ---
-            document.querySelectorAll('.estrofa p').forEach(p => {
-                const spans = [];
-                // 1. Reemplazar spans existentes con placeholders y guardarlos
-                let tempContent = p.innerHTML.replace(/<span.*?<\/span>/g, (match) => {
-                    spans.push(match);
-                    return `%%SPAN_${spans.length - 1}%%`;
-                });
+    <div id="estrofa-5" class="estrofa align-left">
+      <p>Me asusté,</p>
+      <p>pero la curiosidad fue más fuerte.</p>
+      <p>Le pregunté, temblando:</p>
+      <p class="dialogo">—¿A qué te refieres?</p>
+    </div>
 
-                // 2. Envolver el texto restante (que ahora es seguro) en spans de palabras
-                const wrappedContent = tempContent.split(/(\s+)/).filter(Boolean).map(part => {
-                    if (part.includes('%%SPAN_') || part.trim() === '') {
-                        return part;
-                    }
-                    return `<span class="word">${part}</span>`;
-                }).join('');
+    <div id="estrofa-6" class="estrofa align-right">
+      <p>El hilo suspiró,</p>
+      <p>como si las fibras que lo sostienen</p>
+      <p>cargaran <span class="highlight">siglos de secretos:</span></p>
+      <p class="thread-voice">—Ella jamás ató aquel nudo.</p>
+      <p class="thread-voice">Siempre fuiste tú,</p>
+      <p class="thread-voice">anudándote a la idea,</p>
+      <p>tejiendo la ilusión con tus propias manos,</p>
+      <p><span class="highlight">confundiendo deseo con destino.</span></p>
+    </div>
 
-                // 3. Reinsertar los spans originales en lugar de los placeholders
-                p.innerHTML = wrappedContent.replace(/%%SPAN_(\d+)%%/g, (match, index) => {
-                    return spans[parseInt(index, 10)];
-                });
-            });
+    <div id="estrofa-7" class="estrofa align-left">
+      <p>Quise defenderme,</p>
+      <p>quise decirle que sí me amó,</p>
+      <p>que hubo <span class="highlight">momentos de verdad,</span></p>
+      <p>que sus ojos no mentían</p>
+      <p>cuando me miraban bajo la lluvia.</p>
+    </div>
 
-            // --- LÓGICA DE PARTÍCULAS ---
-            const particlesContainer = document.getElementById('particles-container');
-            const mainThreadPath = document.getElementById('main-thread-path');
-            if (mainThreadPath) {
-                const pathLength = mainThreadPath.getTotalLength();
-                
-                function createParticle() {
-                    const pointOnThread = mainThreadPath.getPointAtLength(Math.random() * pathLength);
-                    
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    particle.style.left = `${pointOnThread.x}px`;
-                    particle.style.top = `${pointOnThread.y}px`;
-                    
-                    particle.style.setProperty('--x-end', `${(Math.random() - 0.5) * 100}px`);
-                    particle.style.setProperty('--y-end', `${(Math.random() - 0.5) * 100 - 30}px`);
+    <div id="estrofa-8" class="estrofa align-right">
+      <p class="thread-voice">El hilo rió, suave, irónico:</p>
+      <p class="thread-voice">—Momentos, sí…</p>
+      <p class="thread-voice">pero no eternidad.</p>
+      <p><span class="highlight">Tú pusiste la eternidad en sus labios,</span></p>
+      <p><span class="highlight">y ella solo bebía del instante.</span></p>
+    </div>
 
-                    particlesContainer.appendChild(particle);
-                    setTimeout(() => particle.remove(), 3000);
-                }
-                setInterval(createParticle, 150);
-            }
+    <div id="estrofa-9" class="estrofa align-left">
+      <p>Me quedé callado,</p>
+      <p>y en el silencio entendí:</p>
+      <p>yo era quien cargaba el <span class="highlight">peso del lazo,</span></p>
+      <p>quien tensaba y cuidaba</p>
+      <p>ese hilo invisible.</p>
+    </div>
 
-            // --- OBSERVADOR PARA ESTROFAS Y ANIMACIONES ESPECIALES ---
-            const pendulumContainer = document.getElementById('pendulum-container');
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const target = entry.target;
-                        
-                        if (target.classList.contains('estrofa')) {
-                            target.classList.add('visible');
-                            const words = target.querySelectorAll('.word');
-                            words.forEach((word, index) => {
-                                word.style.transitionDelay = `${index * 50}ms`;
-                            });
-                        }
-                        
-                        if (target.id === 'pendulum-trigger') {
-                            pendulumContainer.classList.add('visible');
-                            const rect = target.getBoundingClientRect();
-                            pendulumContainer.style.top = `${rect.top + window.scrollY}px`;
-                            pendulumContainer.style.left = `${rect.left + (rect.width / 2) - 50}px`;
-                        }
+    <div id="estrofa-10" class="estrofa align-right">
+      <p class="thread-voice">El hilo rojo habló por última vez:</p>
+      <p class="thread-voice">—No te culpes por amar de más.</p>
+      <p><span class="highlight">Algunos nacen con el corazón lleno de nudos,</span></p>
+      <p><span class="highlight">otros solo saben desatarse.</span></p>
+    </div>
+  </div>
+</div>
 
-                        if (target.id === 'tug-trigger') {
-                           target.parentElement.classList.add('is-tugging');
-                           setTimeout(() => target.parentElement.classList.remove('is-tugging'), 600);
-                        }
-                    } else {
-                        if (entry.target.id === 'pendulum-trigger') {
-                           pendulumContainer.classList.remove('visible');
-                        }
-                    }
-                });
-            }, { threshold: 0.2 });
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const body = document.body;
+  const mainCanvas = document.getElementById('main-canvas');
+  const themeToggle = document.getElementById('theme-toggle');
+  const pendulumContainer = document.getElementById('pendulum-container');
+  const poemContent = document.getElementById('poem-content');
 
-            document.querySelectorAll('.estrofa, #pendulum-trigger, #tug-trigger').forEach(el => observer.observe(el));
-        });
-    </script>
+  // Theme init
+  if (localStorage.getItem('theme') === 'light') body.classList.add('light-mode');
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('light-mode');
+    localStorage.setItem('theme', body.classList.contains('light-mode') ? 'light' : 'dark');
+  });
+
+  // Function to fit svg heights to document height so threads are continuous
+  function fitCanvasHeight() {
+    const contentHeight = Math.max(document.documentElement.scrollHeight, window.innerHeight);
+    document.querySelectorAll('.thread').forEach(svg => {
+      svg.style.height = contentHeight + 'px';
+      // also set attribute height for some browsers
+      svg.setAttribute('height', contentHeight);
+    });
+    mainCanvas.style.minHeight = contentHeight + 'px';
+  }
+
+  // Wait fonts (and layout) before measuring, improves accuracy
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => {
+    setTimeout(fitCanvasHeight, 60);
+  });
+  window.addEventListener('resize', () => { setTimeout(fitCanvasHeight, 60); });
+  window.addEventListener('load', fitCanvasHeight);
+
+  // Wrap words in .word while preserving existing spans
+  document.querySelectorAll('.estrofa p').forEach(p => {
+    const stored = [];
+    let tmp = p.innerHTML.replace(/<span[\s\S]*?<\/span>/g, match => {
+      stored.push(match);
+      return `%%SPAN_${stored.length - 1}%%`;
+    });
+    const parts = tmp.split(/(\s+)/).filter(Boolean);
+    const out = parts.map(part => {
+      if (/^%%SPAN_(\d+)%%$/.test(part) || /^\s+$/.test(part)) return part;
+      return `<span class="word">${part}</span>`;
+    }).join('');
+    p.innerHTML = out.replace(/%%SPAN_(\d+)%%/g, (_, i) => stored[Number(i)]);
+  });
+
+  // Particles (using main path)
+  const particlesContainer = document.getElementById('particles-container');
+  const mainThreadPath = document.getElementById('main-thread-path');
+  if (mainThreadPath && particlesContainer) {
+    const pathLen = mainThreadPath.getTotalLength();
+    function spawnParticle(){
+      const len = Math.random() * pathLen;
+      const pt = mainThreadPath.getPointAtLength(len);
+      const d = document.createElement('div');
+      d.className = 'particle';
+      d.style.left = (pt.x - 2) + 'px';
+      d.style.top = (pt.y - 2) + 'px';
+      particlesContainer.appendChild(d);
+      const dx = (Math.random() - .5) * 80;
+      const dy = (Math.random() - .9) * 50 - 20;
+      const dur = 2400 + Math.random() * 1200;
+      const start = performance.now();
+      function frame(t){
+        const p = Math.min(1, (t - start)/dur);
+        d.style.transform = `translate(${dx * p}px, ${dy * p}px) scale(${1 - 0.9 * p})`;
+        d.style.opacity = String(1 - p);
+        if(p < 1) requestAnimationFrame(frame);
+        else d.remove();
+      }
+      requestAnimationFrame(frame);
+    }
+    const iv = setInterval(spawnParticle, 160);
+    window.addEventListener('beforeunload', () => clearInterval(iv));
+  }
+
+  // IntersectionObserver for estrofas, pendulum, tug
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const el = entry.target;
+      if (entry.isIntersecting) {
+        if (el.classList && el.classList.contains('estrofa')) {
+          el.classList.add('visible');
+          el.querySelectorAll('.word').forEach((w, i) => w.style.transitionDelay = (i * 35) + 'ms');
+        }
+        if (el.id === 'pendulum-trigger') {
+          pendulumContainer.classList.add('visible');
+          const r = el.getBoundingClientRect();
+          const left = r.left + (r.width / 2) + window.scrollX - 50;
+          const top = r.top + window.scrollY - 10;
+          pendulumContainer.style.left = Math.max(8, left) + 'px';
+          pendulumContainer.style.top = Math.max(8, top) + 'px';
+        }
+        if (el.id === 'tug-trigger') {
+          const parent = el.closest('.estrofa');
+          if (parent) {
+            parent.classList.add('is-tugging');
+            setTimeout(() => parent.classList.remove('is-tugging'), 620);
+          }
+          const fg = document.getElementById('foreground-thread');
+          fg && fg.classList.add('pulse');
+          setTimeout(() => fg && fg.classList.remove('pulse'), 700);
+        }
+      } else {
+        if (el.id === 'pendulum-trigger') pendulumContainer.classList.remove('visible');
+      }
+    });
+  }, { threshold: 0.2 });
+
+  // observe all estrofas & triggers
+  document.querySelectorAll('.estrofa, #pendulum-trigger, #tug-trigger').forEach(el => observer.observe(el));
+
+  // Parallax for threads on scroll
+  const threads = Array.from(document.querySelectorAll('.thread')).map(svg => ({
+    el: svg,
+    depth: parseFloat(svg.dataset.depth) || 0.12
+  }));
+  let lastScroll = window.scrollY, ticking = false;
+  function onScroll() {
+    lastScroll = window.scrollY;
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        threads.forEach(t => t.el.style.transform = `translate3d(0, ${lastScroll * t.depth}px, 0)`);
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // accessibility: press T to toggle theme
+  window.addEventListener('keydown', (e) => {
+    if ((e.key === 't' || e.key === 'T') && !e.ctrlKey && !e.metaKey) themeToggle.click();
+  });
+});
+</script>
 </body>
 </html>
