@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posia Personal</title>
+    <title>Poesía en el Viento</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,11 +47,6 @@
             transform: translateY(0);
         }
 
-        /*
-         * =============================================================
-         * CSS PARA LUCIÉRNAGAS CONTENIDAS DENTRO DE UNA TARJETA
-         * =============================================================
-        */
         .firefly-card-bg {
             /* Contenedor principal de las luciérnagas, posicionado para llenar la tarjeta padre */
             position: absolute;
@@ -105,7 +100,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <a href="#" class="font-bold text-xl text-burgundy dark:text-soft-gold">Poesia personal: J.R.</a>
+                    <a href="#" class="font-bold text-xl text-burgundy dark:text-soft-gold">Poesía en el Viento</a>
                 </div>
                 <div class="flex items-center space-x-4">
                     <a href="#" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-soft-gold/20 dark:hover:bg-cream/20">Inicio</a>
@@ -169,7 +164,7 @@
                         <p class="mt-4 text-gray-700 dark:text-gray-300 flex-grow">
                            Solo quiero mostrarte que debajo de estos colores, si hay paz.
                         </p>
-                        <a href="Poema3.html" class="mt-6 self-start font-bold text-soft-gold dark:text-cream hover:underline">
+                        <a href="poema3.html" class="mt-6 self-start font-bold text-soft-gold dark:text-cream hover:underline">
                             Leer completo &rarr;
                         </a>
                     </div>
@@ -220,6 +215,28 @@
                     </div>
                 </div>
 
+                <div class="relative group bg-cream dark:bg-dark-blue border border-dark-blue/10 dark:border-cream/10 rounded-lg p-6 overflow-hidden transition-all duration-300 transform hover:scale-105 hover:shadow-2xl stanza" style="transition-delay: 100ms;">
+
+  <div
+    class="absolute inset-0 bg-repeat opacity-30 dark:opacity-20"
+    style="background-image: url('data:image/svg+xml,%3Csvg%20xmlns=%27http://www.w3.org/2000/svg%27%20width=%276%27%20height=%276%27%20viewBox=%270%200%206%206%27%3E%3Cg%20fill=%27%239C92AC%27%20fill-opacity=%270.4%27%20fill-rule=%27evenodd%27%3E%3Cpath%20d=%27M5%200h1L0%206V5zM6%205v1H5z%27/%3E%3C/g%3E%3C/svg%3E');">
+  </div>
+  <div class="absolute -top-8 -left-8 w-40 h-40 bg-blue-200/50 dark:bg-blue-400/20 rounded-full blur-xl transform transition-transform duration-500 group-hover:scale-125"></div>
+
+  <div class="absolute bottom-4 right-4 w-48 h-12 bg-rose-200/50 dark:bg-rose-400/20 rounded-full blur-lg transform rotate-12 transition-transform duration-500 group-hover:-rotate-12"></div>
+
+  <div class="relative z-10 flex flex-col h-full">
+    <h2 class="text-2xl font-serif font-bold text-burgundy dark:text-soft-gold">El Pintor de Sueños</h2>
+    <p class="mt-4 text-gray-700 dark:text-gray-300 flex-grow">
+      ...en mi afán de ser tu musa descubrí mi verdadero papel: el pintor era yo.
+    </p>
+    <a href="poema8.html" class="mt-6 self-start font-bold text-soft-gold dark:text-cream hover:underline">
+      Leer completo &rarr;
+    </a>
+  </div>
+</div>
+
+
             </div>
         </div>
     </main>
@@ -227,13 +244,12 @@
     <footer class="relative bg-gray-200 dark:bg-gray-900 py-8 overflow-hidden">
         <div id="footer-particles" class="absolute top-0 left-0 w-full h-full z-0"></div>
         <div class="text-center text-gray-600 dark:text-gray-400 relative z-10">
-            <p>&copy; 2025 Josuesito_io J.R. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Poesía en el Viento. Todos los derechos reservados.</p>
         </div>
     </footer>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- LÓGICA DEL MODO OSCURO ---
         const darkModeToggle = document.getElementById('darkModeToggle');
         const themeIconContainer = document.getElementById('theme-icon-container');
         const sunIcon = `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`;
@@ -266,8 +282,6 @@
             });
         }, { threshold: 0.1 });
         document.querySelectorAll('.stanza').forEach(el => observer.observe(el));
-
-        // --- LÓGICA PARA PARTÍCULAS DEL FOOTER ---
         const footerParticlesContainer = document.getElementById('footer-particles');
         if (footerParticlesContainer) {
             for (let i = 0; i < 15; i++) {
@@ -284,6 +298,4 @@
     });
     </script>
 </body>
-
 </html>
-
