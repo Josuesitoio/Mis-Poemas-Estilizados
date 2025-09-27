@@ -7,37 +7,31 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 
     <style>
         :root {
             /* Tema Oscuro (por defecto) */
             --bg-color: #0d1117;
-            --text-color: #c9d1d9;
-            --heading-color: #ffffff;
-            --shard-border-color: rgba(255, 255, 255, 0.1);
-            --shard-gradient-start: rgba(255, 255, 255, 0.05);
-            --shard-gradient-end: rgba(255, 255, 255, 0);
-            --highlight-gradient: linear-gradient(90deg, #e1e1e1, #ffffff, #c1c1c1, #ffffff, #e1e1e1);
+            --text-color: #e0e0e0;
+            --highlight-gradient: linear-gradient(90deg, #e0e0e0, #ffffff, #b0b0b0, #ffffff, #e0e0e0);
+            --crystal-base-color: rgba(200, 220, 255, 0.05); /* Muy sutil */
+            --crystal-shine-color: rgba(255, 255, 255, 0.15);
+            --crystal-border-color: rgba(255, 255, 255, 0.1);
             
             --font-serif: 'Cormorant Garamond', serif;
-            --font-sans: 'Montserrat', sans-serif;
+            --font-sans: 'Inter', sans-serif;
             --transition-speed: 0.5s;
-
-            /* Variables para el reflejo del ratón, actualizadas por JS */
-            --mouse-x: 50%;
-            --mouse-y: 50%;
         }
         
         body.light-mode {
              /* Tema Claro */
-            --bg-color: #e2e8f0;
-            --text-color: #2d3748;
-            --heading-color: #1a202c;
-            --shard-border-color: rgba(0, 0, 0, 0.1);
-            --shard-gradient-start: rgba(255, 255, 255, 0.5);
-            --shard-gradient-end: rgba(255, 255, 255, 0.1);
+            --bg-color: #f0f4f8;
+            --text-color: #333333;
             --highlight-gradient: linear-gradient(90deg, #4a5568, #2d3748, #718096, #2d3748, #4a5568);
+            --crystal-base-color: rgba(100, 150, 200, 0.1);
+            --crystal-shine-color: rgba(0, 0, 0, 0.1);
+            --crystal-border-color: rgba(0, 0, 0, 0.08);
         }
 
         html { scroll-behavior: smooth; }
@@ -51,75 +45,88 @@
             transition: background-color var(--transition-speed), color var(--transition-speed);
         }
 
-        /* --- CONTENEDOR DE FRAGMENTOS 3D --- */
-        #shard-container {
+        /*
+        ==================================================
+        --- FONDO: CRISTAL DINÁMICO QUE SE FRAGMENTA ---
+        ==================================================
+        * Un elemento grande simula el cristal inicial.
+        * Más abajo, se generan fragmentos dinámicos.
+        */
+        #crystal-background {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
-            perspective: 800px;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
             overflow: hidden;
         }
 
-        .shard {
+        #main-crystal {
             position: absolute;
-            /* El reflejo interactivo sigue al ratón usando variables CSS */
-            background-image: 
-                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.2) 0%, transparent 15%),
-                linear-gradient(135deg, var(--shard-gradient-start), var(--shard-gradient-end));
-            border: 1px solid var(--shard-border-color);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            transform-style: preserve-3d;
-            animation: float 25s infinite ease-in-out alternate;
-            /* Optimización de rendimiento */
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, var(--crystal-shine-color) 0%, transparent 80%);
+            border: 1px solid var(--crystal-border-color);
+            transition: opacity 1s ease-out;
+        }
+
+        .crystal-fragment {
+            position: absolute;
+            background: var(--crystal-base-color);
+            border: 1px solid var(--crystal-border-color);
+            backdrop-filter: blur(2px); /* Un ligero blur para el efecto de cristal */
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 1s ease-out, transform 1s ease-out;
             will-change: transform, opacity;
-            transition: transform 1.5s ease-out, opacity 1.5s ease-out, border-color var(--transition-speed), background-image var(--transition-speed);
+            z-index: 0; /* Asegurar que esté por debajo del contenido */
+        }
+        
+        .crystal-fragment.active {
+            opacity: 1;
+            transform: scale(1);
         }
 
-        .face-shard {
-            /* Los fragmentos de la cara tienen un brillo más sutil y un movimiento más lento */
-            animation-duration: 40s;
-            background-image: 
-                radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.1) 0%, transparent 20%),
-                linear-gradient(135deg, var(--shard-gradient-start), var(--shard-gradient-end));
-        }
-
-        /* Formas de los fragmentos */
+        /* Formas para los fragmentos */
         .shape1 { clip-path: polygon(0% 15%, 15% 0%, 100% 50%, 85% 100%, 20% 90%); }
         .shape2 { clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%); }
         .shape3 { clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%); }
         .shape4 { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
 
-        @keyframes float {
-            from { transform: translate3d(var(--x-start), var(--y-start), var(--z-start)) rotateX(0deg) rotateY(0deg); }
-            to { transform: translate3d(var(--x-end), var(--y-end), var(--z-start)) rotateX(180deg) rotateY(180deg); }
-        }
-
-        /* Animación final de "desmoronamiento" */
-        #shard-container.is-crumbling .shard {
-            transform: translateY(110vh) rotateZ(90deg) !important;
-            opacity: 0 !important;
-        }
-        
         main, header {
             position: relative;
             z-index: 1;
+            /* Se añade un fondo transparente al contenido para mejor lectura sobre el cristal */
+            background-color: rgba(0, 0, 0, 0.4); 
+            transition: background-color var(--transition-speed);
         }
-        
+        body.light-mode main, body.light-mode header {
+            background-color: rgba(255, 255, 255, 0.6);
+        }
+
         .page-header {
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
-            font-family: var(--font-serif);
         }
 
         .page-header h1 {
-            font-size: 3.5rem;
+            font-family: var(--font-serif);
+            font-size: 4rem;
             font-weight: 700;
-            color: var(--heading-color);
-            text-shadow: 0 0 15px var(--heading-color);
+            color: var(--text-color); /* Cambiado a text-color para coherencia con el tema */
+            letter-spacing: 2px;
+            animation: text-glow 4s infinite alternate;
+        }
+
+        @keyframes text-glow {
+            from { text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+            to { text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+        }
+        body.light-mode @keyframes text-glow {
+            from { text-shadow: 0 0 10px rgba(0,0,0,0.2); }
+            to { text-shadow: 0 0 20px rgba(0,0,0,0.4); }
         }
 
         #poema-museo {
@@ -127,32 +134,30 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
+            padding: 10vh 0;
         }
         
         .estrofa {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
             max-width: 700px;
             padding: 2rem;
-        }
-
-        .estrofa p {
-            font-size: 1.8rem;
-            line-height: 1.9;
-            margin: 0.8rem 0;
-            font-weight: 400;
+            margin-bottom: 20vh; /* Espaciado entre estrofas */
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1.2s cubic-bezier(0.19, 1, 0.22, 1), transform 1.2s cubic-bezier(0.19, 1, 0.22, 1);
+            transform: translateY(50px);
+            transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1), transform 1s cubic-bezier(0.19, 1, 0.22, 1);
         }
         
-        .estrofa.visible p {
+        .estrofa.is-visible {
             opacity: 1;
             transform: translateY(0);
         }
 
+        .estrofa p {
+            font-size: 1.6rem;
+            line-height: 1.8;
+            margin: 0.5rem 0;
+            font-weight: 300;
+        }
+        
         .highlight {
             font-family: var(--font-serif);
             font-weight: 700;
@@ -161,12 +166,12 @@
             -webkit-background-clip: text;
             background-clip: text;
             background-image: var(--highlight-gradient);
-            background-size: 300% 100%;
-            animation: liquid-crystal 6s infinite linear;
+            background-size: 200% 100%;
+            animation: shimmer-text 5s infinite linear;
             transition: background-image var(--transition-speed);
         }
         
-        @keyframes liquid-crystal {
+        @keyframes shimmer-text {
             from { background-position: 200% 0; }
             to { background-position: 0 0; }
         }
@@ -181,7 +186,7 @@
         }
         #theme-toggle:hover { transform: scale(1.1); }
         #theme-toggle svg {
-            width: 24px; height: 24px; color: var(--heading-color);
+            width: 24px; height: 24px; color: var(--text-color);
             position: absolute; transition: opacity 0.3s, transform 0.3s;
         }
         #sun-icon { opacity: 0; }
@@ -189,9 +194,11 @@
         body.light-mode #moon-icon { opacity: 0; }
 
         @media (max-width: 768px) {
-            .page-header h1 { font-size: 2.5rem; }
-            .estrofa { min-height: auto; margin-bottom: 20vh; }
-            .estrofa p { font-size: 1.4rem; }
+            .page-header h1 { font-size: 2.8rem; }
+            .estrofa { padding: 1rem; margin-bottom: 15vh; }
+            .estrofa p { font-size: 1.3rem; }
+            main, header { background-color: rgba(0, 0, 0, 0.6); } /* Más opaco en móvil */
+            body.light-mode main, body.light-mode header { background-color: rgba(255, 255, 255, 0.8); }
         }
     </style>
 </head>
@@ -201,11 +208,12 @@
         <svg id="sun-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8M12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18M20,12.5H23V11.5H20V12.5M1,12.5H4V11.5H1V12.5M12.5,20V23H11.5V20H12.5M12.5,1V4H11.5V1H12.5M18.36,19.78L20.5,21.92L19.78,22.63L17.65,20.5L18.36,19.78M4.22,6.34L6.35,4.22L5.64,3.5L3.5,5.64L4.22,6.34M19.78,5.64L17.65,3.5L18.36,4.22L20.5,6.34L19.78,5.64M3.5,18.36L5.64,17.65L6.34,19.78L4.22,20.5L3.5,18.36Z"></path></svg>
     </button>
 
-    <div id="shard-container">
-        </div>
+    <div id="crystal-background">
+        <div id="main-crystal"></div>
+    </div>
 
     <header class="page-header">
-        <h1>El valle del olvido</h1>
+        <h1>El Espejo Fragmentado</h1>
     </header>
 
     <main id="poema-museo">
@@ -224,9 +232,7 @@
             <p>Hey! -grité-</p>
             <p>Pero al voltear,</p>
             <p><span class="highlight">mi reflejo</span> bailaba en cada cristal,</p>
-            <p>como perro tras su propia sombra.</p>
-        </section>
-        <section class="estrofa">
+            <p>como perro tras su propia sombra</p>
             <p>Corrí y pude ver</p>
             <p>que en esos <span class="highlight">espejos</span> aparecía ella.</p>
         </section>
@@ -245,9 +251,6 @@
             <p>Qué extraña es la luz -pensé-</p>
             <p>que <span class="highlight">ciega y arrastra.</span></p>
         </section>
-        
-        <div id="crumble-trigger"></div>
-        
         <section class="estrofa">
             <p>Ese <span class="highlight">rostro cortado, con pedazos de cristal, desmoronándose</span>,</p>
             <p>en el <span class="highlight">valle del olvido</span>,</p>
@@ -279,7 +282,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const body = document.body;
-            const shardContainer = document.getElementById('shard-container');
+            const crystalBackground = document.getElementById('crystal-background');
+            const mainCrystal = document.getElementById('main-crystal');
+            const estrofas = document.querySelectorAll('.estrofa');
 
             // --- LÓGICA DEL INTERRUPTOR DE TEMA ---
             const themeToggle = document.getElementById('theme-toggle');
@@ -290,104 +295,66 @@
                 body.classList.toggle('light-mode');
                 localStorage.setItem('theme', body.classList.contains('light-mode') ? 'light' : 'dark');
             });
-            
-            // --- LÓGICA DEL REFLEJO INTERACTIVO ---
-            window.addEventListener('mousemove', (e) => {
-                const { clientX, clientY } = e;
-                const x = Math.round((clientX / window.innerWidth) * 100);
-                const y = Math.round((clientY / window.innerHeight) * 100);
-                shardContainer.style.setProperty('--mouse-x', `${x}%`);
-                shardContainer.style.setProperty('--mouse-y', `${y}%`);
-            }, { passive: true });
-            
-            // --- GENERADOR DE FRAGMENTOS DE CRISTAL ---
-            const SHARD_COUNT = 30; 
-            const FACE_SHARD_COUNT = 15;
 
-            // Coordenadas relativas (porcentaje) para una forma de cara abstracta
-            const faceMap = [
-                { x: 45, y: 35, z: -300 }, { x: 55, y: 35, z: -300 }, // Ojos
-                { x: 50, y: 45, z: -250 }, // Nariz
-                { x: 48, y: 60, z: -280 }, { x: 52, y: 60, z: -280 }, // Boca
-                { x: 35, y: 50, z: -100 }, { x: 65, y: 50, z: -100 }, // Mejillas
-                { x: 40, y: 25, z: 0 }, { x: 60, y: 25, z: 0 }, // Frente
-                { x: 50, y: 75, z: -50 } // Barbilla
-            ];
-
-            // Crear fragmentos que forman la cara
-            for (let i = 0; i < faceMap.length; i++) {
-                const point = faceMap[i];
-                const shard = document.createElement('div');
-                const shapeClass = `shape${(i % 4) + 1}`;
-                shard.className = `shard face-shard ${shapeClass}`;
-                
-                const size = Math.random() * 80 + 40;
-                const zPos = point.z + (Math.random() * 100 - 50);
-
-                shard.style.width = `${size}px`;
-                shard.style.height = `${size}px`;
-                shard.style.top = `${point.y + (Math.random() * 8 - 4)}%`;
-                shard.style.left = `${point.x + (Math.random() * 8 - 4)}%`;
-                
-                shard.style.setProperty('--x-start', `${Math.random()*20-10}px`);
-                shard.style.setProperty('--y-start', `${Math.random()*20-10}px`);
-                shard.style.setProperty('--x-end', `${Math.random()*20-10}px`);
-                shard.style.setProperty('--y-end', `${Math.random()*20-10}px`);
-                shard.style.setProperty('--z-start', `${zPos}px`);
-                shard.style.animationDelay = `${Math.random() * 5}s`;
-                shardContainer.appendChild(shard);
-            }
-
-            // Crear fragmentos aleatorios adicionales para llenar el espacio
-            for (let i = 0; i < SHARD_COUNT; i++) {
-                const shard = document.createElement('div');
-                const shapeClass = `shape${Math.ceil(Math.random() * 4)}`;
-                shard.className = `shard ${shapeClass}`;
-
-                const size = Math.random() * 120 + 30; 
-                const zPos = Math.random() * 1000 - 500;
-                
-                shard.style.width = `${size}px`;
-                shard.style.height = `${size}px`;
-                shard.style.top = `${Math.random() * 100}%`;
-                shard.style.left = `${Math.random() * 100}%`;
-
-                shard.style.setProperty('--x-start', `${Math.random()*100-50}px`);
-                shard.style.setProperty('--y-start', `${Math.random()*100-50}px`);
-                shard.style.setProperty('--x-end', `${Math.random()*100-50}px`);
-                shard.style.setProperty('--y-end', `${Math.random()*100-50}px`);
-                shard.style.setProperty('--z-start', `${zPos}px`);
-                shard.style.animationDuration = `${Math.random() * 20 + 20}s`;
-                shardContainer.appendChild(shard);
-            }
-
-            // --- OBSERVADOR PARA LA APARICIÓN DEL TEXTO Y ANIMACIÓN FINAL ---
-            const estrofaObserver = new IntersectionObserver((entries) => {
+            // --- OBSERVADOR PARA LA APARICIÓN DE ESTROFAS Y FRAGMENTACIÓN DEL CRISTAL ---
+            const estrofaObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        const lines = entry.target.querySelectorAll('p');
-                        lines.forEach((line, index) => {
-                            line.style.transitionDelay = `${index * 150}ms`;
-                        });
-                        estrofaObserver.unobserve(entry.target);
+                        entry.target.classList.add('is-visible');
+                        
+                        // Generar fragmentos cuando la estrofa es visible
+                        const rect = entry.target.getBoundingClientRect();
+                        const scrollY = window.scrollY || window.pageYOffset;
+                        const triggerPoint = rect.top + scrollY + rect.height / 2; // Centro de la estrofa
+
+                        if (triggerPoint > window.innerHeight * 0.5) { // Empieza a fragmentar después de la mitad de la primera vista
+                            generateFragments(triggerPoint);
+                        }
                     }
                 });
-            }, { threshold: 0.3 });
+            }, { 
+                threshold: 0.2, // Activa cuando el 20% de la estrofa es visible
+                rootMargin: "0px 0px -10% 0px"
+            });
+            estrofas.forEach(estrofa => estrofaObserver.observe(estrofa));
 
-            document.querySelectorAll('.estrofa').forEach(estrofa => estrofaObserver.observe(estrofa));
+            // --- LÓGICA DE FRAGMENTACIÓN DINÁMICA ---
+            const SHAPE_CLASSES = ['shape1', 'shape2', 'shape3', 'shape4'];
+            let lastFragmentY = 0; // Para evitar superposición excesiva
+            let fragmentCount = 0; // Para limitar la cantidad de fragmentos
 
-            const crumbleTrigger = document.getElementById('crumble-trigger');
-            const finalObserver = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    shardContainer.classList.add('is-crumbling');
-                    finalObserver.unobserve(entries[0].target);
+            function generateFragments(yPosition) {
+                if (fragmentCount > 50) return; // Limitar fragmentos para rendimiento
+
+                const numFragments = Math.random() * 3 + 1; // 1 a 3 fragmentos por estrofa
+                for (let i = 0; i < numFragments; i++) {
+                    const fragment = document.createElement('div');
+                    fragment.className = `crystal-fragment ${SHAPE_CLASSES[Math.floor(Math.random() * SHAPE_CLASSES.length)]}`;
+
+                    const size = Math.random() * 100 + 50; // Tamaño de 50px a 150px
+                    const top = yPosition + (Math.random() * 100 - 50) - (window.innerHeight * 0.5); // Relativo al scroll y centro
+                    const left = Math.random() * 100; // Porcentaje de ancho
+
+                    fragment.style.width = `${size}px`;
+                    fragment.style.height = `${size}px`;
+                    fragment.style.top = `${top}px`;
+                    fragment.style.left = `${left}%`;
+                    fragment.style.transform = `scale(${Math.random() * 0.5 + 0.7}) rotate(${Math.random() * 360}deg)`; // Escala y rotación aleatoria
+
+                    crystalBackground.appendChild(fragment);
+
+                    // Pequeño retraso para la animación de aparición
+                    setTimeout(() => fragment.classList.add('active'), 50);
+                    fragmentCount++;
                 }
-            }, { threshold: 0.8 });
-
-            if (crumbleTrigger) {
-                finalObserver.observe(crumbleTrigger);
             }
+
+            // Ocultar el cristal principal a medida que se desplaza hacia abajo
+            window.addEventListener('scroll', () => {
+                const scrollY = window.scrollY || window.pageYOffset;
+                const opacity = Math.max(0, 1 - (scrollY / (window.innerHeight * 2))); // Desaparece en 2 vh de scroll
+                mainCrystal.style.opacity = opacity;
+            }, { passive: true });
         });
     </script>
 </body>
