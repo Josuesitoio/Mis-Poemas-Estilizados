@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Epifanía en el Arte — Poema</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,600&family=Cinzel:wght@400;700&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+
+<style>
+/* -------------------- Reset ligero -------------------- */
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;font-family:Montserrat,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#111}
+
+/* ---------- Tema claro/oscuro (usa prefers-color-scheme) ---------- */
+:root{
+  --bg-1: #f6f4f2;
+  --bg-2: #efe9e6;
+  --bg-fallback: #efe9e6; /* sólido de respaldo */
+  --card: rgba(255,255,255,0.75);
+  --card-fallback: #ffffff; /* respaldo para navegadores que no soportan variables/transparencia */
+  --text: #0b0b0b;
+  --muted: #6b6b6b;
+  --accent1: #8b5cf6; /* violeta */
+  --accent2: #ec4899; /* rosa */
+  --gold: #f59e0b;
+  --glass-blur: 12px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg-1:#071022;
+    --bg-2:#0f1724;
+    --bg-fallback:#071022;
+    --card: rgba(12,18,28,0.6);
+    --card-fallback: #0c1218;
+    --text: #f4f6f8;
+    --muted:#9aa4b2;
+    --accent1:#b794f4;
+    --accent2:#f472b6;
+    --gold:#f6c568;
+    --glass-blur:10px;
+  }
+}
+
+/* ---------- Fondo artístico (degradado + textura) ---------- */
+body{
+  /* respaldo sólido primero para navegadores que no muestran gradientes/transparencias correctamente */
+  background-color: var(--bg-fallback);
+  /* capas de degradado (se mantienen como antes) */
+  background-image: radial-gradient(1200px 600px at 10% 10%, var(--bg-2) 0%, transparent 30%),
+                    radial-gradient(1000px 500px at 90% 90%, rgba(255,255,255,0.02) 0%, transparent 20%),
+                    linear-gradient(160deg,var(--bg-1),transparent 50%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  display:flex;align-items:flex-start;justify-content:center;padding:48px 20px;
+}
+
+/* paper/card */
+.sheet{
+  width:min(900px,96vw);
+  /* respaldo en caso de que CSS variables no se interpreten */
+  background-color: rgba(255,255,255,0.95);
+  /* valor principal (transparente) */
+  background: var(--card);
+  border-radius:18px;
+  padding:42px 40px;
+  /* soporte para navegadores WebKit */
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.05);
+  box-shadow: 0 10px 30px rgba(2,6,23,0.18), inset 0 1px 0 rgba(255,255,255,0.03);
+  position:relative;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.04);
+}
+
+/* subtle paper grain using pseudo element */
+.sheet::before{
+  content:'';position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(0,0,0,0.015) 1px, transparent 1px);background-size:6px 6px;opacity:0.6;
+}
+
+.header{
+  display:flex;flex-direction:column;align-items:center;margin-bottom:18px;gap:6px;
+}
+.title{
+  font-family:'Playfair Display',serif;font-size:3.2rem;line-height:1;color:var(--text);font-weight:700;letter-spacing:0.4px;position:relative;display:inline-block;padding:6px 12px 0 12px;text-align:center;
+}
+.subtitle{font-style:italic;color:var(--muted);font-size:1.05rem}
+
+/* SVG brush underline */
+.brush-wrap{position:absolute;left:50%;transform:translateX(-50%);top:76px;width:420px;pointer-events:none}
+svg.brush{width:100%;height:36px;overflow:visible}
+path.stroke{fill:none;stroke:var(--accent1);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1000;stroke-dashoffset:1000;filter:drop-shadow(0 6px 8px rgba(139,92,246,0.12));}
+@media (prefers-color-scheme: dark){path.stroke{stroke:var(--accent2)}}
+
+/* ---------- Layout poema ---------- */
+.content{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}
+.stanza{font-size:1.12rem;color:var(--text);line-height:1.75;opacity:0;transform:translateY(22px) scale(0.995);transition:opacity .7s cubic-bezier(.2,.9,.3,1),transform .7s cubic-bezier(.2,.9,.3,1);will-change:opacity,transform;padding:8px 6px;border-radius:8px}
+.stanza.visible{opacity:1;transform:translateY(0) scale(1)}
+
+.stanza p{margin:0 0 10px 0}
+
+/* Highlight styles */
+.highlight{font-family:'Playfair Display',serif;font-weight:600;color:var(--accent1);position:relative;padding:0 6px;border-radius:6px;transition:transform .25s ease,box-shadow .25s ease}
+.highlight::after{content:'';position:absolute;left:3px;right:3px;bottom:3px;height:8px;border-radius:4px;background:linear-gradient(90deg,var(--accent1),var(--accent2));opacity:0.12;z-index:-1}
+.highlight:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(139,92,246,0.12)}
+
+.glow{color:var(--gold);font-weight:700;text-shadow:0 0 8px rgba(246,158,11,0.12);padding:0 6px}
+.soft{font-style:italic;color:var(--muted)}
+
+/* ribbon badge for some phrases */
+.ribbon{display:inline-block;padding:6px 10px;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;font-weight:600;font-size:.95rem;box-shadow:0 6px 20px rgba(0,0,0,0.08);transform:translateY(0);transition:transform .2s ease}
+.ribbon:hover{transform:translateY(-6px)}
+
+/* small decorative column on the left (like a paint stroke) */
+.art-bar{position:absolute;left:18px;top:18px;bottom:18px;width:8px;border-radius:8px;background:linear-gradient(var(--accent1),var(--accent2));filter:blur(6px);opacity:0.9}
+
+/* footer small note */
+.note{margin-top:12px;color:var(--muted);font-size:.92rem;text-align:center}
+
+/* decorative floating orbs */
+.orb{position:absolute;border-radius:999px;mix-blend-mode:screen;opacity:.18;filter:blur(20px);pointer-events:none}
+.orb.one{width:220px;height:220px;right:-60px;top:-40px;background:linear-gradient(180deg,var(--accent1),transparent)}
+.orb.two{width:160px;height:160px;left:-60px;bottom:-60px;background:linear-gradient(180deg,var(--gold),transparent)}
+
+/* ---------- small responsive tweaks ---------- */
+@media (max-width:700px){.title{font-size:2.2rem}.brush-wrap{top:64px;width:300px}}
+
+/* ---------- prefers-reduced-motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  .stanza{transition:none}
+  .brush-wrap svg path.stroke{animation:none;stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+  <div class="sheet" role="article" aria-label="Poema Epifanía en el Arte">
+    <div class="art-bar" aria-hidden="true"></div>
+
+    <div class="header">
+      <div class="title">Epifanía en el Arte</div>
+      <div class="subtitle">Un instante de lucidez, un encuentro con lo <span style="font-family:'Playfair Display',serif;">inexpresable</span>.</div>
+    </div>
+
+    <!-- animated brush underline -->
+    <div class="brush-wrap" aria-hidden="true">
+      <svg class="brush" viewBox="0 0 800 60" preserveAspectRatio="none">
+        <path class="stroke" d="M20,30 C140,10 260,50 380,30 C500,10 620,50 780,30" />
+      </svg>
+    </div>
+
+    <div class="orb one" aria-hidden="true"></div>
+    <div class="orb two" aria-hidden="true"></div>
+
+    <div class="content" id="poem">
+
+      <section class="stanza" data-index="0">
+        <p>¿Has escuchado la palabra <span class="highlight">epifanía</span>?</p>
+        <p>En lo religioso, es <span class="ribbon">aparición de lo divino</span>.</p>
+        <p>En la filosofía, un <span class="highlight">instante de lucidez</span>: algo <span class="soft">inexpresable</span>.</p>
+      </section>
+
+      <section class="stanza" data-index="1">
+        <p>Amo escucharte hablar de <span class="highlight">arte</span>.</p>
+        <p>Siempre lo muestras, lo cuentas…</p>
+        <p>sin notar que <span class="glow">tú misma eres una de esas obras</span> que tanto admiras.</p>
+        <p>Verte es una <span class="highlight">revelación</span>, una <span class="highlight">epifanía en el arte</span>.</p>
+      </section>
+
+      <section class="stanza" data-index="2">
+        <p>Me <span class="glow">revelas lo divino</span>.</p>
+        <p>Me das <span class="highlight">lucidez</span>.</p>
+        <p>Eres <span class="highlight">arte</span> al hablar, al mirar;</p>
+        <p>en <span class="soft">tus ojos</span>, <span class="soft">tu sonrisa</span>, <span class="soft">tus cachetes hermosos</span>,</p>
+        <p><span class="soft">tus labios tan preciados</span>.</p>
+      </section>
+
+      <section class="stanza" data-index="3">
+        <p>Eres <span class="highlight">instante que ilumina</span>,</p>
+        <p><span class="glow">aparición sagrada</span> que me deja <span class="highlight">atónito</span>.</p>
+      </section>
+
+      <section class="stanza" data-index="4">
+        <p><span class="highlight">Obra digna de contemplación</span>:</p>
+        <p>pinceladas <span class="soft">suaves y violentas</span>;</p>
+        <p><span class="soft">pasión y calma</span>;</p>
+        <p><span class="soft">tormenta y calor</span>, pero también <span class="soft">frialdad</span>.</p>
+        <p>Como <span class="highlight">lluvia en verano</span>.</p>
+        <p>Como <span class="highlight">paz en la tormenta</span>.</p>
+        <p>Como el <span class="highlight">rayo</span> que parte el cielo y muestra su esplendor.</p>
+        <p>Como el <span class="highlight">alba</span> cada día.</p>
+      </section>
+
+      <section class="stanza" data-index="5">
+        <p>Eres el <span class="highlight">arte</span> que amas.</p>
+        <p>Eres tú: <span class="highlight">mi epifanía en el arte</span>.</p>
+        <p>Porque a través del <span class="highlight">arte</span>, el ser humano <span class="glow">trasciende su finitud</span></p>
+        <p>y <span class="highlight">dialoga con la eternidad</span>.</p>
+      </section>
+
+      <section class="stanza" data-index="6">
+        <p>Tú eres ese <span class="highlight">arte</span> que me hace <span class="highlight">trascender</span>,</p>
+        <p>el <span class="highlight">arte</span> que me eleva,</p>
+        <p>el <span class="highlight">arte</span> que me permite <span class="highlight">hablar con la eternidad</span>.</p>
+      </section>
+
+    </div>
+  </div>
+
+<script>
+// animate brush path on load
+(function(){
+  const path = document.querySelector('.stroke');
+  if(path){
+    const len = path.getTotalLength();
+    path.style.strokeDasharray = len;
+    path.style.strokeDashoffset = len;
+    // animate
+    requestAnimationFrame(()=>{
+      path.style.transition = 'stroke-dashoffset 900ms ease-out, opacity 400ms ease';
+      path.style.strokeDashoffset = '0';
+    });
+  }
+})();
+
+// IntersectionObserver for stanzas with stagger
+(function(){
+  const stanzas = document.querySelectorAll('.stanza');
+  const opts = {root:null,rootMargin:'-10% 0px -10% 0px',threshold:0.06};
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        const el = entry.target;
+        const i = Number(el.dataset.index||0);
+        // staggered reveal using inline timeout to create cascading feel
+        setTimeout(()=>el.classList.add('visible'), i*120);
+        // unobserve to keep it
+        io.unobserve(el);
+      }
+    });
+  },opts);
+  stanzas.forEach(s=>io.observe(s));
+})();
+
+// tiny floating orbs subtle motion
+(function(){
+  const one = document.querySelector('.orb.one');
+  const two = document.querySelector('.orb.two');
+  let t = 0;
+  function anim(){
+    t += 0.008;
+    if(one) one.style.transform = `translateY(${Math.sin(t)*8}px) translateX(${Math.cos(t/1.2)*6}px)`;
+    if(two) two.style.transform = `translateY(${Math.cos(t*1.1)*6}px) translateX(${Math.sin(t/1.3)*5}px)`;
+    requestAnimationFrame(anim);
+  }
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches) requestAnimationFrame(anim);
+})();
+
+// accessible: respect reduced motion
+if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  document.querySelectorAll('.stanza').forEach(s=>s.classList.add('visible'));
+}
+</script>
+</body>
+</html>
