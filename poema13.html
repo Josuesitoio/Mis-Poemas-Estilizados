@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donde la Luz No Ilumina</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,500;1,400&display=swap');
+
+        :root {
+            /* --- Colores Modo Claro --- */
+            --bg-light: url('https://www.transparenttextures.com/patterns/broken-noise.png'); /* Textura de grietas */
+            --bg-color-light: #c5c2b8;
+            --card-bg-light: rgba(255, 255, 255, 0.35);
+            --text-color-light: #2c2c2c;
+            --header-color-light: #000000;
+            --highlight-light: #8B4513; /* Marrón siena, como óxido o madera vieja */
+            --highlight-hover-light: #000;
+            --cursor-color: #000;
+
+            /* --- Colores Modo Oscuro --- */
+            --bg-color-dark: #0d0d0d;
+            --card-bg-dark: rgba(10, 10, 10, 0.45);
+            --text-color-dark: #a0a0a0;
+            --header-color-dark: #ffffff;
+            --highlight-dark: #d4b280; /* Oro viejo */
+            --highlight-hover-dark: #fff;
+        }
+
+        /* --- Estructura Base --- */
+        body {
+            margin: 0;
+            transition: background-color 0.8s ease;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        
+        /* --- Contenedor de Partículas (Fondo Animado) --- */
+        #particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: black;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(105vh);
+                opacity: 0;
+            }
+        }
+
+        /* --- Estilos Modo Claro --- */
+        .light-mode {
+            background-color: var(--bg-color-light);
+            background-image: var(--bg-light); /* Textura de grietas */
+        }
+        .light-mode .poem-container {
+            background: var(--card-bg-light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .light-mode header h1 { color: var(--header-color-light); }
+        .light-mode main p { color: var(--text-color-light); }
+        .light-mode .highlight { color: var(--highlight-light); }
+        .light-mode .highlight:hover { color: var(--highlight-hover-light); text-shadow: 0 0 10px rgba(139, 69, 19, 0.5); }
+        .light-mode .theme-switcher { background: #fff; color: #000; }
+        .light-mode #cursor-dot { background-color: var(--cursor-color); }
+        .light-mode #cursor-dot.highlight-hover { background-color: var(--highlight-light); }
+        .light-mode .particle { background: #5a5a5a; }
+
+        /* --- Estilos Modo Oscuro --- */
+        .dark-mode {
+            background-color: var(--bg-color-dark);
+        }
+        .dark-mode .poem-container {
+            background: var(--card-bg-dark);
+            border: 1px solid rgba(0, 0, 0, 0.4);
+        }
+        .dark-mode header h1 { color: var(--header-color-dark); }
+        .dark-mode main p { color: var(--text-color-dark); }
+        .dark-mode .highlight { color: var(--highlight-dark); }
+        .dark-mode .highlight:hover { color: var(--highlight-hover-dark); text-shadow: 0 0 12px rgba(212, 178, 128, 0.6); }
+        .dark-mode .theme-switcher { background: #000; color: #fff; }
+        .dark-mode #cursor-dot { background-color: #fff; }
+        .dark-mode #cursor-dot.highlight-hover { background-color: var(--highlight-dark); }
+        .dark-mode .particle { background: #fff; }
+
+        /* --- Cursor Personalizado --- */
+        #cursor-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            transition: transform 0.2s ease-out, background-color 0.3s ease;
+        }
+        
+        /* --- Contenedor Único del Poema --- */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10vh 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            font-size: 2.8em;
+            letter-spacing: 3px;
+            margin-bottom: 8vh;
+            text-transform: uppercase;
+        }
+
+        .poem-container {
+            padding: 40px 50px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: background 0.8s ease, border 0.8s ease;
+            animation: glitch-tremor 20s infinite linear;
+        }
+        
+        /* Animación de derrumbe sutil */
+        @keyframes glitch-tremor {
+            0%, 7%, 15%, 35%, 52%, 78%, 100% { transform: translate(0, 0) skew(0, 0); }
+            5% { transform: translate(1px, -1px) skew(0.2deg, 0); }
+            10% { transform: translate(-1px, 1px) skew(-0.2deg, 0); }
+            40% { transform: translate(1px, 1px) skew(0, -0.1deg); }
+            50% { transform: translate(-1px, -1px) skew(0, 0.1deg); }
+            80% { transform: translate(1px, -1px) skew(-0.1deg, 0.1deg); }
+        }
+        
+        main p {
+            font-family: 'Lora', serif;
+            font-size: 1.4em;
+            line-height: 2;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .highlight {
+            font-style: italic;
+            font-weight: 500;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        /* --- Botón de Cambio de Tema --- */
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid rgba(128, 128, 128, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: background 0.8s ease, color 0.8s ease, transform 0.3s ease;
+        }
+        .theme-switcher:hover {
+            transform: scale(1.1) rotate(15deg);
+        }
+
+    </style>
+</head>
+
+<body class="dark-mode">
+
+    <div id="particles-container"></div>
+
+    <div id="cursor-dot"></div>
+
+    <div class="theme-switcher" id="theme-toggle">☀️</div>
+
+    <div class="main-content">
+        <header>
+            <h1>Donde la Luz No Ilumina</h1>
+        </header>
+
+        <main class="poem-container">
+            <p>
+                Hay lugares donde <span class="highlight">la luz no ilumina,</span>
+                <span class="highlight">sino que hiere</span> con su blancura fingida.<br>
+                Allí, cada palabra está marcada,
+                cada gesto vigilado por <span class="highlight">ojos invisibles</span>
+                que pesan más que los barrotes del hierro.<br>
+                <br>
+                El silencio no es ausencia de sonido,
+                <span class="highlight">es mandato</span> que se clava en la lengua,<br>
+                mordaza que nadie ve,
+                pero todos sienten en los huesos.<br>
+                Un silencio que ordena:<br>
+                “Respira cuando yo lo diga,
+                <span class="highlight">piensa lo que ya pensé por ti,</span>
+                mira solo hacia donde señalo.”<br>
+                <br>
+                El amor se pronuncia como consuelo,
+                pero detrás es <span class="highlight">cuchillo envuelto en flores.</span><br>
+                Promete alas, y <span class="highlight">arranca las plumas</span>
+                para que olvides el vuelo.<br>
+                Cada abrazo es un contrato no escrito,
+                cada sonrisa, una deuda sin fin.<br>
+                <br>
+                La culpa es <span class="highlight">pan diario,</span>
+                servido por manos temblorosas,<br>
+                y quien osa preguntar
+                queda desnudo ante un tribunal
+                que no necesita jueces para condenar.<br>
+                <br>
+                La esperanza no salva,
+                solo <span class="highlight">adorna la jaula con oro.</span><br>
+                Y el alma, cansada, aprende a andar encorvada,
+                como quien pide <span class="highlight">perdón por existir.</span><br>
+                <br>
+                Hay bocas que hablan en nombre de la luz
+                mientras <span class="highlight">siembran tinieblas.</span><br>
+                Manos que se alzan para bendecir,
+                pero al caer, dejan cicatrices.<br>
+                Lo llaman guía,
+                pero es <span class="highlight">dominio disfrazado de bondad.</span><br>
+                <br>
+                El cuerpo obedece,
+                pero la mente grita en la oscuridad:<br>
+                <span class="highlight">¿cuánto más durará este teatro?</span><br>
+                ¿Cuánto más cargar una cruz
+                que nunca fue tuya,<br>
+                impuesta a la fuerza,
+                como si tu espalda hubiese nacido para arder?<br>
+                <br>
+                Y al final, no hay chispa.
+                Solo el eco de una voz que se apagó,<br>
+                un hueco donde antes <span class="highlight">ardía la rebeldía.</span><br>
+                La luz no regresa;
+                la oscuridad aprende tu nombre<br>
+                y lo repite, una y otra vez,
+                hasta que lo olvidas.<br>
+                <br>
+                Allí, entre las ruinas de lo que fuiste,
+                queda el silencio —<br>
+                ya no como mandato,
+                sino como <span class="highlight">tumba.</span>
+            </p>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+            const cursorDot = document.getElementById('cursor-dot');
+            const highlights = document.querySelectorAll('.highlight');
+            const particlesContainer = document.getElementById('particles-container');
+
+            // --- Generador de Partículas ---
+            const createParticle = () => {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 3 + 1; // Tamaño entre 1px y 4px
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `-5vh`;
+                
+                const duration = Math.random() * 15 + 10; // Duración entre 10s y 25s
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${Math.random() * 10}s`;
+
+                particlesContainer.appendChild(particle);
+                
+                // Limpiamos la partícula del DOM cuando termina su animación
+                particle.addEventListener('animationend', () => {
+                    particle.remove();
+                });
+            };
+
+            // Creamos un lote inicial de partículas
+            for (let i = 0; i < 70; i++) { // Aumentamos la cantidad de partículas
+                createParticle();
+            }
+            // Y creamos nuevas partículas periódicamente
+            setInterval(createParticle, 300);
+
+
+            // --- Lógica del Cursor ---
+            window.addEventListener('mousemove', (e) => {
+                cursorDot.style.left = `${e.clientX}px`;
+                cursorDot.style.top = `${e.clientY}px`;
+            });
+            
+            highlights.forEach(h => {
+                h.addEventListener('mouseenter', () => cursorDot.classList.add('highlight-hover'));
+                h.addEventListener('mouseleave', () => cursorDot.classList.remove('highlight-hover'));
+            });
+
+            // --- Lógica del Botón de Tema ---
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                body.classList.toggle('light-mode');
+
+                if (body.classList.contains('dark-mode')) {
+                    themeToggle.textContent = '☀️';
+                } else {
+                    themeToggle.textContent = '🌙';
+                }
+            });
+
+            // Iniciar en modo oscuro y cambiar el icono
+             if (body.classList.contains('dark-mode')) {
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+        });
+    </script>
+</body>
+</html>
